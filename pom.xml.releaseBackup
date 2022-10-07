@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.brihaspathee.zeus</groupId>
     <artifactId>transaction-manager</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
     <name>Transaction Manager</name>
     <description>Zeus Enrollment Transaction Manager</description>
     <properties>
@@ -181,7 +181,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <apiDocsUrl>http://localhost:8095/v3/api-docs.yaml</apiDocsUrl>
+                    <apiDocsUrl>http://localhost:8090/v3/api-docs.yaml</apiDocsUrl>
                     <outputFileName>transaction-manager-api.yaml</outputFileName>
                     <outputDir>openapi-spec</outputDir>
                     <skip>false</skip>

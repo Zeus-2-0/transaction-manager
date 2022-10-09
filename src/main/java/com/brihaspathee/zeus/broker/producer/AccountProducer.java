@@ -75,7 +75,7 @@ public class AccountProducer {
     private ProducerRecord<String, ZeusMessagePayload<AccountDto>> buildProducerRecord(ZeusMessagePayload<AccountDto> messagePayload){
         RecordHeader messageHeader = new RecordHeader("payload-id",
                 "test payload id".getBytes());
-        return new ProducerRecord<>("ZEUS.ACCOUNT.PROCESSOR",
+        return new ProducerRecord<>("ZEUS.ACCOUNT.PROCESSING.REQ",
                 null,
                 "test payload id 2",
                 messagePayload,

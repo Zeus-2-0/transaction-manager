@@ -4,6 +4,20 @@ zeus-transaction-manager:
 server:
   port: 8095
 spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/transactionmanagerdb?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: transactionmanageradmin
+    password: password
+    flyway:
+      user: transactionmanageradmin
+      password: password
   kafka:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

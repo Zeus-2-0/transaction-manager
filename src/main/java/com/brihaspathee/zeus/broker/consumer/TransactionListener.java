@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Headers;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -65,7 +66,7 @@ public class TransactionListener {
      * @throws JsonProcessingException
      */
     @KafkaListener(topics = "ZEUS.TRANSACTION.PROCESSOR")
-    // @SendTo("ZEUS.VALIDATOR.ACCOUNT.ACK")
+    @SendTo("ZEUS.TRANSACTION.PROCESSOR.ACK")
     public ZeusMessagePayload<Acknowledgement> listen(
             ConsumerRecord<String, ZeusMessagePayload<TransactionDto>> consumerRecord)
             throws JsonProcessingException {

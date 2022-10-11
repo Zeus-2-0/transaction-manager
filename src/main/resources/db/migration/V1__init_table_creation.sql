@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS `transactionmanagerdb`.`payload_tracker` (
     `payload_key` VARCHAR(50) NOT NULL COMMENT 'The key for the type of payload, like account number for account payload and zeus transaction control number for transaction payload.',
     `payload_key_type_code` VARCHAR(45) NOT NULL COMMENT 'Identifies the type of payload like ACCOUNT, TRANSACTION, FILE etc',
     `payload` LONGTEXT NOT NULL COMMENT 'The payload as a string',
+    `payload_direction_type_code` VARCHAR(45) NOT NULL COMMENT 'Identifies the direction of the payload INBOUND or OUTBOUND',
     `src_dest` VARCHAR(100) NOT NULL COMMENT 'Identifies the source if the payload is inbound and destination if the payload is outbound',
     `created_date` DATETIME NULL COMMENT 'Date when the record was created',
     `updated_date` DATETIME NULL COMMENT 'Date when the record was updated',

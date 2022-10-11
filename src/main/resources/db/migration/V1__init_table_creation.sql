@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS `transactionmanagerdb`.`payload_tracker_detail` (
     `response_type_code` VARCHAR(45) NOT NULL COMMENT 'The type of response received or sent. e.g. ACK, RESULT etc',
     `response_payload_id` VARCHAR(45) NOT NULL COMMENT 'The unique id assigned to the response payload',
     `response_payload` LONGTEXT NOT NULL,
+    `payload_direction_type_code` VARCHAR(45) NOT NULL COMMENT 'Identifies the direction of the payload INBOUND or OUTBOUND',
+    `src_dest` VARCHAR(100) NOT NULL COMMENT 'Identifies the source if the payload is inbound and destination if the payload is outbound',
     `created_date` DATETIME NULL COMMENT 'Date when the record was created',
     `updated_date` DATETIME NULL COMMENT 'Date when the record was updated',
     PRIMARY KEY (`payload_tracker_detail_sk`),

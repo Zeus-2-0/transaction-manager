@@ -6,6 +6,7 @@ import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
 import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
 import com.brihaspathee.zeus.web.model.AccountDto;
 import com.brihaspathee.zeus.web.model.TransactionDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class TransactionProcessorImpl implements TransactionProcessor {
      * @param transactionDto
      */
     @Override
-    public void processTransaction(TransactionDto transactionDto) {
+    public void processTransaction(TransactionDto transactionDto) throws JsonProcessingException {
         transactionValidationProducer.publishTransaction(transactionDto);
         AccountDto accountDto = AccountDto.builder()
                 .accountNumber(ZeusRandomStringGenerator.randomString(15))

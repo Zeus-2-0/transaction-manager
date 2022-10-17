@@ -81,9 +81,12 @@ public class TransactionListener {
         ZeusMessagePayload<TransactionDto> messagePayload = objectMapper.readValue(
                 valueAsString,
                 new TypeReference<ZeusMessagePayload<TransactionDto>>(){});
-        log.info("Transaction received from the Kafka topic:{}", messagePayload.getPayload());
+        log.info("Transaction received from the Kafka topic:{}", messagePayload.getPayload().getZtcn());
         PayloadTracker payloadTracker = createPayloadTracker(messagePayload);
-        // transactionProcessor.processTransaction(messagePayload.getPayload());
+        log.info("Payload inbound from data transform service created for transaction {} is {}",
+                messagePayload.getPayload().getZtcn(),
+                payloadTracker.getPayloadId() );
+        transactionProcessor.processTransaction(messagePayload.getPayload()).subscribe();
         return createAcknowledgment(messagePayload, payloadTracker);
 
     }
@@ -98,8 +101,8 @@ public class TransactionListener {
         String payloadAsString = objectMapper.writeValueAsString(messagePayload);
         PayloadTracker payloadTracker = PayloadTracker.builder()
                 .payloadDirectionTypeCode("INBOUND")
-                .payload_key("TRANSACTION")
-                .payload_key_type_code(messagePayload.getPayload().getZtcn())
+                .payload_key(messagePayload.getPayload().getZtcn())
+                .payload_key_type_code("TRANSACTION")
                 .payload(payloadAsString)
                 .payloadId(messagePayload.getPayloadId())
                 .sourceDestinations(StringUtils.join(

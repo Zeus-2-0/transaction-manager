@@ -1,12 +1,18 @@
 package com.brihaspathee.zeus.broker.producer;
 
+import com.brihaspathee.zeus.constants.ZeusServiceNames;
+import com.brihaspathee.zeus.domain.entity.PayloadTracker;
+import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerHelper;
 import com.brihaspathee.zeus.message.MessageMetadata;
 import com.brihaspathee.zeus.message.ZeusMessagePayload;
+import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
 import com.brihaspathee.zeus.web.model.AccountDto;
 import com.brihaspathee.zeus.web.model.TransactionDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -47,25 +53,36 @@ public class AccountProducer {
     private final ObjectMapper objectMapper;
 
     /**
+     * Payload tracker helper instance to create the payload tracker record
+     */
+    private final PayloadTrackerHelper payloadTrackerHelper;
+
+    /**
      * The method that publishes the messages to the kafka topic
      * @param accountDto
      */
-    public void publishAccount(AccountDto accountDto){
-        String[] messageDestinations = {"MEMBER-MGMT-SERVICE"};
+    public void publishAccount(AccountDto accountDto) throws JsonProcessingException {
+        log.info("About to publish the account to member management service;{}", accountDto.getAccountNumber());
+        String[] messageDestinations = {ZeusServiceNames.MEMBER_MGMT_SERVICE};
         ZeusMessagePayload<AccountDto> messagePayload = ZeusMessagePayload.<AccountDto>builder()
                 .messageMetadata(MessageMetadata.builder()
-                        .messageSource("TRANSACTION-MANAGER")
+                        .messageSource(ZeusServiceNames.TRANSACTION_MANAGER)
                         .messageDestination(messageDestinations)
                         .messageCreationTimestamp(LocalDateTime.now())
                         .build())
                 .payload(accountDto)
+                .payloadId(ZeusRandomStringGenerator.randomString(15))
                 .build();
         accountCreationCallback.setAccountDto(accountDto);
-        // createPayloadTracker(messagePayload);
+        PayloadTracker payloadTracker = createPayloadTracker(messagePayload);
+        log.info("Payload tracker created to send the account {} to member management service is {}",
+                accountDto.getAccountNumber(),
+                payloadTracker.getPayloadId());
         ProducerRecord<String, ZeusMessagePayload<AccountDto>> producerRecord =
                 buildProducerRecord(messagePayload);
         kafkaTemplate.send(producerRecord).addCallback(accountCreationCallback);
-        log.info("After the send method is called");
+        log.info("After the publishing the account {} to member management service",
+                accountDto.getAccountNumber());
     }
 
     /**
@@ -80,5 +97,25 @@ public class AccountProducer {
                 "test payload id 2",
                 messagePayload,
                 Arrays.asList(messageHeader));
+    }
+
+    /**
+     * Create the payload tracker record
+     * @param messagePayload
+     * @throws JsonProcessingException
+     */
+    private PayloadTracker createPayloadTracker(ZeusMessagePayload<AccountDto> messagePayload)
+            throws JsonProcessingException {
+        String payloadAsString = objectMapper.writeValueAsString(messagePayload);
+        PayloadTracker payloadTracker = PayloadTracker.builder()
+                .payloadDirectionTypeCode("OUTBOUND")
+                .payload_key(messagePayload.getPayload().getAccountNumber())
+                .payload_key_type_code("ACCOUNT")
+                .payload(payloadAsString)
+                .payloadId(messagePayload.getPayloadId())
+                .sourceDestinations(StringUtils.join(
+                        messagePayload.getMessageMetadata().getMessageDestination()))
+                .build();
+        return payloadTrackerHelper.createPayloadTracker(payloadTracker);
     }
 }

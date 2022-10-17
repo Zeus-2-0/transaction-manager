@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * Created in Intellij IDEA
@@ -40,12 +41,13 @@ public class TransactionProcessorImpl implements TransactionProcessor {
      * @param transactionDto
      */
     @Override
-    public void processTransaction(TransactionDto transactionDto) throws JsonProcessingException {
+    public Mono<Void> processTransaction(TransactionDto transactionDto) throws JsonProcessingException {
         transactionValidationProducer.publishTransaction(transactionDto);
         AccountDto accountDto = AccountDto.builder()
                 .accountNumber(ZeusRandomStringGenerator.randomString(15))
                 .lineOfBusinessTypeCode(transactionDto.getLineOfBusinessTypeCode())
                 .build();
         accountProducer.publishAccount(accountDto);
+        return Mono.empty();
     }
 }

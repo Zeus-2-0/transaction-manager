@@ -2,6 +2,7 @@ package com.brihaspathee.zeus.service.interfaces;
 
 import com.brihaspathee.zeus.web.model.TransactionDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import reactor.core.publisher.Mono;
 
 /**
  * Created in Intellij IDEA
@@ -18,5 +19,5 @@ public interface TransactionProcessor {
      * Process the transaction
      * @param transactionDto
      */
-    void processTransaction(TransactionDto transactionDto) throws JsonProcessingException;
+    Mono<Void> processTransaction(TransactionDto transactionDto) throws JsonProcessingException;
 }

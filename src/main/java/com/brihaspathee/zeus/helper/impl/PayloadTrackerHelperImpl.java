@@ -33,6 +33,7 @@ public class PayloadTrackerHelperImpl implements PayloadTrackerHelper {
      */
     @Override
     public PayloadTracker createPayloadTracker(PayloadTracker payloadTracker) {
+        log.info("Payload tracker about to be inserted: {}", payloadTracker);
         return payloadTrackerRepository.save(payloadTracker);
     }
 

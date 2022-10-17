@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.broker.producer;
 
+import com.brihaspathee.zeus.constants.ZeusServiceNames;
 import com.brihaspathee.zeus.domain.entity.PayloadTracker;
 import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerHelper;
 import com.brihaspathee.zeus.message.MessageMetadata;
@@ -60,10 +61,10 @@ public class TransactionValidationProducer {
      * @param transactionDto
      */
     public void publishTransaction(TransactionDto transactionDto) throws JsonProcessingException {
-        String[] messageDestinations = {"TRANSACTION-MANAGER"};
+        String[] messageDestinations = {ZeusServiceNames.VALIDATION_SERVICE};
         ZeusMessagePayload<TransactionDto> messagePayload = ZeusMessagePayload.<TransactionDto>builder()
                 .messageMetadata(MessageMetadata.builder()
-                        .messageSource("VALIDATION-SERVICE")
+                        .messageSource(ZeusServiceNames.TRANSACTION_MANAGER)
                         .messageDestination(messageDestinations)
                         .messageCreationTimestamp(LocalDateTime.now())
                         .build())
@@ -71,11 +72,15 @@ public class TransactionValidationProducer {
                 .payloadId(ZeusRandomStringGenerator.randomString(15))
                 .build();
         transactionValidationCallback.setTransactionDto(transactionDto);
-        createPayloadTracker(messagePayload);
+        log.info("About to send the transaction {} to validation service", transactionDto.getZtcn());
+        PayloadTracker payloadTracker = createPayloadTracker(messagePayload);
+        log.info("The payload tracker created for sending the transaction {} to validation service {}",
+                transactionDto.getZtcn(),
+                payloadTracker.getPayloadId());
         ProducerRecord<String, ZeusMessagePayload<TransactionDto>> producerRecord =
                 buildProducerRecord(messagePayload);
         kafkaTemplate.send(producerRecord).addCallback(transactionValidationCallback);
-        log.info("After the send method is called");
+        log.info("After send the transaction {} to validation", transactionDto.getZtcn());
     }
 
     /**
@@ -93,11 +98,11 @@ public class TransactionValidationProducer {
     }
 
     /**
-     * Create the payload tracker detail record
+     * Create the payload tracker record
      * @param messagePayload
      * @throws JsonProcessingException
      */
-    private void createPayloadTracker(ZeusMessagePayload<TransactionDto> messagePayload)
+    private PayloadTracker createPayloadTracker(ZeusMessagePayload<TransactionDto> messagePayload)
             throws JsonProcessingException {
         String payloadAsString = objectMapper.writeValueAsString(messagePayload);
         PayloadTracker payloadTracker = PayloadTracker.builder()
@@ -109,6 +114,6 @@ public class TransactionValidationProducer {
                 .sourceDestinations(StringUtils.join(
                         messagePayload.getMessageMetadata().getMessageDestination()))
                 .build();
-        payloadTrackerHelper.createPayloadTracker(payloadTracker);
+        return payloadTrackerHelper.createPayloadTracker(payloadTracker);
     }
 }

@@ -1,7 +1,7 @@
 package com.brihaspathee.zeus.broker.producer;
 
+import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.message.ZeusMessagePayload;
-import com.brihaspathee.zeus.web.model.AccountDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

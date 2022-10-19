@@ -2,11 +2,11 @@ package com.brihaspathee.zeus.broker.producer;
 
 import com.brihaspathee.zeus.constants.ZeusServiceNames;
 import com.brihaspathee.zeus.domain.entity.PayloadTracker;
+import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerHelper;
 import com.brihaspathee.zeus.message.MessageMetadata;
 import com.brihaspathee.zeus.message.ZeusMessagePayload;
 import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
-import com.brihaspathee.zeus.web.model.TransactionDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

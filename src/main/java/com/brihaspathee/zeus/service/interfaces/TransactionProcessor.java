@@ -1,6 +1,6 @@
 package com.brihaspathee.zeus.service.interfaces;
 
-import com.brihaspathee.zeus.web.model.TransactionDto;
+import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import reactor.core.publisher.Mono;
 

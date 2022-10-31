@@ -1,5 +1,15 @@
 package com.brihaspathee.zeus.domain.entity;
 
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 /**
  * Created in Intellij IDEA
  * User: Balaji Varadharajan
@@ -9,5 +19,77 @@ package com.brihaspathee.zeus.domain.entity;
  * Package Name: com.brihaspathee.zeus.domain.entity
  * To change this template use File | Settings | File and Code Template
  */
+@Getter
+@Setter
+@Builder
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "TRANSACTION_STATUS")
 public class TransactionStatus {
+
+    /**
+     * Primary key of the table
+     */
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @Type(type = "uuid-char")
+    @GenericGenerator(name="UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "transaction_status_sk", length = 36, columnDefinition = "varchar", updatable = false, nullable = false)
+    private UUID transactionStatusSK;
+
+    /**
+     * The detail of the transaction
+     */
+    @OneToOne
+    @JoinColumn(name = "transaction_sk")
+    private Transaction transaction;
+
+    /**
+     * indicates the sequence of the status
+     */
+    @Column(name = "status_seq")
+    private int status_seq;
+
+    /**
+     * The status of the transaction
+     */
+    @Column(name="transaction_status_type_code", length = 50, columnDefinition = "varchar", nullable = false)
+    private String transactionStatusTypeCode;
+
+    /**
+     * The processing status of the transaction
+     */
+    @Column(name="processing_status_type_code", length = 50, columnDefinition = "varchar", nullable = false)
+    private String processingStatusTypeCode;
+
+    /**
+     * The date when the record was created
+     */
+    @CreationTimestamp
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    /**
+     * The date when the record was updated
+     */
+    @UpdateTimestamp
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
+
+    /**
+     * toString method
+     * @return
+     */
+    @Override
+    public String toString() {
+        return "TransactionStatus{" +
+                "transactionStatusSK=" + transactionStatusSK +
+                ", status_seq=" + status_seq +
+                ", transactionStatusTypeCode='" + transactionStatusTypeCode + '\'' +
+                ", processingStatusTypeCode='" + processingStatusTypeCode + '\'' +
+                ", createdDate=" + createdDate +
+                ", updatedDate=" + updatedDate +
+                '}';
+    }
 }

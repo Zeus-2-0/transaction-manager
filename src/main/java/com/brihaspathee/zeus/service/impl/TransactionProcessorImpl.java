@@ -6,6 +6,7 @@ import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
 import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
+import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,16 +39,17 @@ public class TransactionProcessorImpl implements TransactionProcessor {
 
     /**
      * Process transaction
-     * @param transactionDto
+     * @param dataTransformationDto
      */
     @Override
-    public Mono<Void> processTransaction(TransactionDto transactionDto) throws JsonProcessingException {
-        transactionValidationProducer.publishTransaction(transactionDto);
-        AccountDto accountDto = AccountDto.builder()
-                .accountNumber(ZeusRandomStringGenerator.randomString(15))
-                .lineOfBusinessTypeCode(transactionDto.getTradingPartnerDto().getLineOfBusinessTypeCode())
-                .build();
-        accountProducer.publishAccount(accountDto);
+    public Mono<Void> processTransaction(DataTransformationDto dataTransformationDto) throws JsonProcessingException {
+        log.info("Transaction received for processing:{}", dataTransformationDto);
+//        transactionValidationProducer.publishTransaction(dataTransformationDto.getTransactionDto());
+//        AccountDto accountDto = AccountDto.builder()
+//                .accountNumber(ZeusRandomStringGenerator.randomString(15))
+//                .lineOfBusinessTypeCode(dataTransformationDto.getTransactionDto().getTradingPartnerDto().getLineOfBusinessTypeCode())
+//                .build();
+//        accountProducer.publishAccount(accountDto);
         return Mono.empty();
     }
 }

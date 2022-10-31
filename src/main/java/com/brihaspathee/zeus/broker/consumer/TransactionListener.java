@@ -10,6 +10,7 @@ import com.brihaspathee.zeus.message.MessageMetadata;
 import com.brihaspathee.zeus.message.ZeusMessagePayload;
 import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
 import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
+import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,7 +68,7 @@ public class TransactionListener {
     @KafkaListener(topics = "ZEUS.TRANSACTION.PROCESSOR")
     @SendTo("ZEUS.TRANSACTION.PROCESSOR.ACK")
     public ZeusMessagePayload<Acknowledgement> listen(
-            ConsumerRecord<String, ZeusMessagePayload<TransactionDto>> consumerRecord)
+            ConsumerRecord<String, ZeusMessagePayload<DataTransformationDto>> consumerRecord)
             throws JsonProcessingException {
         Headers headers = consumerRecord.headers();
         log.info("Headers are:");
@@ -77,13 +78,13 @@ public class TransactionListener {
         // Convert the payload as String
         String valueAsString = objectMapper.writeValueAsString(consumerRecord.value());
         // Convert it to Zeus Message Payload
-        ZeusMessagePayload<TransactionDto> messagePayload = objectMapper.readValue(
+        ZeusMessagePayload<DataTransformationDto> messagePayload = objectMapper.readValue(
                 valueAsString,
-                new TypeReference<ZeusMessagePayload<TransactionDto>>(){});
-        log.info("Transaction received from the Kafka topic:{}", messagePayload.getPayload().getZtcn());
+                new TypeReference<ZeusMessagePayload<DataTransformationDto>>(){});
+        log.info("Transaction received from the Kafka topic:{}", messagePayload.getPayload().getTransactionDto().getZtcn());
         PayloadTracker payloadTracker = createPayloadTracker(messagePayload);
         log.info("Payload inbound from data transform service created for transaction {} is {}",
-                messagePayload.getPayload().getZtcn(),
+                messagePayload.getPayload().getTransactionDto().getZtcn(),
                 payloadTracker.getPayloadId() );
         transactionProcessor.processTransaction(messagePayload.getPayload()).subscribe();
         return createAcknowledgment(messagePayload, payloadTracker);
@@ -95,12 +96,12 @@ public class TransactionListener {
      * @param messagePayload
      * @throws JsonProcessingException
      */
-    private PayloadTracker createPayloadTracker(ZeusMessagePayload<TransactionDto> messagePayload)
+    private PayloadTracker createPayloadTracker(ZeusMessagePayload<DataTransformationDto> messagePayload)
             throws JsonProcessingException {
         String payloadAsString = objectMapper.writeValueAsString(messagePayload);
         PayloadTracker payloadTracker = PayloadTracker.builder()
                 .payloadDirectionTypeCode("INBOUND")
-                .payload_key(messagePayload.getPayload().getZtcn())
+                .payload_key(messagePayload.getPayload().getTransactionDto().getZtcn())
                 .payload_key_type_code("TRANSACTION")
                 .payload(payloadAsString)
                 .payloadId(messagePayload.getPayloadId())
@@ -118,7 +119,7 @@ public class TransactionListener {
      * @throws JsonProcessingException
      */
     private ZeusMessagePayload<Acknowledgement> createAcknowledgment(
-            ZeusMessagePayload<TransactionDto> messagePayload,
+            ZeusMessagePayload<DataTransformationDto> messagePayload,
             PayloadTracker payloadTracker) throws JsonProcessingException {
         String[] messageDestinations = {"DATA-TRANSFORM-SERVICE"};
         String ackId = ZeusRandomStringGenerator.randomString(15);

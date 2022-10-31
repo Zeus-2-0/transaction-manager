@@ -59,6 +59,7 @@ public class TransactionValidationProducer {
     /**
      * The method that publishes the messages to the kafka topic
      * @param transactionDto
+     * @throws JsonProcessingException
      */
     public void publishTransaction(TransactionDto transactionDto) throws JsonProcessingException {
         String[] messageDestinations = {ZeusServiceNames.VALIDATION_SERVICE};

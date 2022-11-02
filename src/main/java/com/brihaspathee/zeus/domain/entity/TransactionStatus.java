@@ -41,7 +41,7 @@ public class TransactionStatus {
     /**
      * The detail of the transaction
      */
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "transaction_sk")
     private Transaction transaction;
 
@@ -49,7 +49,7 @@ public class TransactionStatus {
      * indicates the sequence of the status
      */
     @Column(name = "status_seq")
-    private int status_seq;
+    private int statusSeq;
 
     /**
      * The status of the transaction
@@ -85,7 +85,7 @@ public class TransactionStatus {
     public String toString() {
         return "TransactionStatus{" +
                 "transactionStatusSK=" + transactionStatusSK +
-                ", status_seq=" + status_seq +
+                ", status_seq=" + statusSeq +
                 ", transactionStatusTypeCode='" + transactionStatusTypeCode + '\'' +
                 ", processingStatusTypeCode='" + processingStatusTypeCode + '\'' +
                 ", createdDate=" + createdDate +

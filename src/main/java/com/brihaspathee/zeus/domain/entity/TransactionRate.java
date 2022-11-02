@@ -69,7 +69,7 @@ public class TransactionRate {
      * The end date of the rate
      */
     @Column(name = "rate_end_date")
-    private LocalDateTime rateEndDate;
+    private LocalDate rateEndDate;
 
     /**
      * The date when the record was created

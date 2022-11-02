@@ -52,7 +52,7 @@ public class Member {
      * A unique member code assigned to the member for the transaction
      */
     @Column(name = "transaction_member_code", length = 20, columnDefinition = "varchar", nullable = false)
-    private String transaction_member_code;
+    private String transactionMemberCode;
 
     /**
      * The relationship code received for the member in the transaction
@@ -139,6 +139,12 @@ public class Member {
     private List<MemberEmail> memberEmails;
 
     /**
+     * The list of the emails received for the member in the transaction
+     */
+    @OneToMany(mappedBy = "member")
+    private List<MemberPhone> memberPhones;
+
+    /**
      * The list of the identifiers received for the member in the transaction
      */
     @OneToMany(mappedBy = "member")
@@ -184,7 +190,7 @@ public class Member {
     public String toString() {
         return "Member{" +
                 "memberSK=" + memberSK +
-                ", transaction_member_code='" + transaction_member_code + '\'' +
+                ", transaction_member_code='" + transactionMemberCode + '\'' +
                 ", relationshipTypeCode='" + relationshipTypeCode + '\'' +
                 ", transactionTypeCode='" + transactionTypeCode + '\'' +
                 ", effectiveDate=" + effectiveDate +

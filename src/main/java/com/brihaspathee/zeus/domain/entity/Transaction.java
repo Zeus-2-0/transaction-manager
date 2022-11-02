@@ -108,8 +108,8 @@ public class Transaction {
     /**
      * Contains the broker of the transaction
      */
-    @OneToOne(mappedBy = "transaction")
-    private TransactionStatus transactionStatus;
+    @OneToMany(mappedBy = "transaction")
+    private List<TransactionStatus> transactionStatus;
 
     /**
      * Contains the members of the transaction

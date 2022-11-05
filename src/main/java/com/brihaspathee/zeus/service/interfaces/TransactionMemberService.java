@@ -1,4 +1,11 @@
-package com.brihaspathee.zeus.service.interfaces;/**
+package com.brihaspathee.zeus.service.interfaces;
+
+import com.brihaspathee.zeus.domain.entity.Transaction;
+import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
+
+import java.util.List;
+
+/**
  * Created in Intellij IDEA
  * User: Balaji Varadharajan
  * Date: 03, November 2022
@@ -6,5 +13,14 @@ package com.brihaspathee.zeus.service.interfaces;/**
  * Project: Zeus
  * Package Name: com.brihaspathee.zeus.service.interfaces
  * To change this template use File | Settings | File and Code Template
- */public interface TransactionMemberService {
+ */
+public interface TransactionMemberService {
+
+    /**
+     * Create a member for the transaction
+     * @param memberDtos
+     * @param transaction
+     */
+    void createMember(List<TransactionMemberDto> memberDtos,
+                      Transaction transaction);
 }

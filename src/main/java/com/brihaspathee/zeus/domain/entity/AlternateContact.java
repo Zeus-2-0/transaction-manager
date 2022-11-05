@@ -55,7 +55,7 @@ public class AlternateContact {
     /**
      * The first name of the alternate contact
      */
-    @Column(name = "first_name", length = 100, columnDefinition = "varchar", nullable = false)
+    @Column(name = "first_name", length = 100, columnDefinition = "varchar", nullable = true)
     private String firstName;
 
     /**

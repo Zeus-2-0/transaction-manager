@@ -1,4 +1,9 @@
-package com.brihaspathee.zeus.helper.interfaces;/**
+package com.brihaspathee.zeus.helper.interfaces;
+
+import com.brihaspathee.zeus.domain.entity.Transaction;
+import com.brihaspathee.zeus.domain.entity.TransactionStatus;
+
+/**
  * Created in Intellij IDEA
  * User: Balaji Varadharajan
  * Date: 04, November 2022
@@ -6,5 +11,16 @@ package com.brihaspathee.zeus.helper.interfaces;/**
  * Project: Zeus
  * Package Name: com.brihaspathee.zeus.helper.interfaces
  * To change this template use File | Settings | File and Code Template
- */public interface TransactionStatusHelper {
+ */
+public interface TransactionStatusHelper {
+
+
+    /**
+     * Create a new transaction status for the transaction
+     * @param transactionStatus
+     * @param transactionProcessingStatus
+     */
+    void createStatus(String transactionStatus,
+                      String transactionProcessingStatus,
+                      Transaction transaction);
 }

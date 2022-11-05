@@ -27,21 +27,50 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TransactionMapperImpl implements TransactionMapper {
 
+    /**
+     * Broker mapper instance
+     */
     private final BrokerMapper brokerMapper;
 
+    /**
+     * Payer mapper instance
+     */
     private final PayerMapper payerMapper;
 
+    /**
+     * Sponsor mapper instance
+     */
     private final SponsorMapper sponsorMapper;
 
+    /**
+     * Trading Partner mapper instance
+     */
     private final TradingPartnerMapper tradingPartnerMapper;
 
+    /**
+     * Attributes mapper instance
+     */
     private final TransactionAttributesMapper attributesMapper;
 
+    /**
+     * Transaction Detail mapper instance
+     */
     private final TransactionDetailMapper detailMapper;
 
+    /**
+     * Transaction Rate mapper instance
+     */
     private final TransactionRateMapper rateMapper;
 
+    /**
+     * Transaction Status mapper instance
+     */
     private final TransactionStatusMapper statusMapper;
+
+    /**
+     * Member mapper instance
+     */
+    private final MemberMapper memberMapper;
 
     /**
      * Convert transaction entity to transaction dto
@@ -67,6 +96,10 @@ public class TransactionMapperImpl implements TransactionMapper {
                 .createdDate(transaction.getCreatedDate())
                 .updatedDate(transaction.getUpdatedDate())
                 .build();
+        // Check and map members
+        if(transaction.getMembers() != null && transaction.getMembers().size() > 0){
+            transactionDto.setMembers(memberMapper.membersToMemberDtos(transaction.getMembers()));
+        }
         // Check and map attributes
         if(transaction.getTransactionAttributes() != null && transaction.getTransactionAttributes().size() > 0){
             transactionDto.setTransactionAttributes(attributesMapper.attributesToAttributeDtos(transaction.getTransactionAttributes()));
@@ -112,6 +145,10 @@ public class TransactionMapperImpl implements TransactionMapper {
                 .createdDate(transactionDto.getCreatedDate())
                 .updatedDate(transactionDto.getUpdatedDate())
                 .build();
+        // Check and map members
+        if(transactionDto.getMembers() != null && transactionDto.getMembers().size() > 0){
+            transaction.setMembers(memberMapper.memberDtosToMembers(transactionDto.getMembers()));
+        }
         // Check and map attributes
         if(transactionDto.getTransactionAttributes() != null && transactionDto.getTransactionAttributes().size() > 0){
             transaction.setTransactionAttributes(attributesMapper.attributeDtosToAttribute(transactionDto.getTransactionAttributes()));

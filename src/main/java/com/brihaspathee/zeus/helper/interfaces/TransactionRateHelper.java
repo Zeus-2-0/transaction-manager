@@ -1,4 +1,11 @@
-package com.brihaspathee.zeus.helper.interfaces;/**
+package com.brihaspathee.zeus.helper.interfaces;
+
+import com.brihaspathee.zeus.domain.entity.Transaction;
+import com.brihaspathee.zeus.dto.transaction.TransactionRateDto;
+
+import java.util.List;
+
+/**
  * Created in Intellij IDEA
  * User: Balaji Varadharajan
  * Date: 03, November 2022
@@ -6,5 +13,14 @@ package com.brihaspathee.zeus.helper.interfaces;/**
  * Project: Zeus
  * Package Name: com.brihaspathee.zeus.helper.interfaces
  * To change this template use File | Settings | File and Code Template
- */public interface TransactionRateHelper {
+ */
+public interface TransactionRateHelper {
+
+    /**
+     * Create transaction rates
+     * @param rateDtos
+     * @param transaction
+     */
+    void createTransactionRates(List<TransactionRateDto> rateDtos,
+                                Transaction transaction);
 }

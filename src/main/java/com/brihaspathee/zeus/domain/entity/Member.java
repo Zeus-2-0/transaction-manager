@@ -190,7 +190,8 @@ public class Member {
     public String toString() {
         return "Member{" +
                 "memberSK=" + memberSK +
-                ", transaction_member_code='" + transactionMemberCode + '\'' +
+                ", transaction=" + transaction +
+                ", transactionMemberCode='" + transactionMemberCode + '\'' +
                 ", relationshipTypeCode='" + relationshipTypeCode + '\'' +
                 ", transactionTypeCode='" + transactionTypeCode + '\'' +
                 ", effectiveDate=" + effectiveDate +
@@ -204,6 +205,12 @@ public class Member {
                 ", productCatalogRate=" + productCatalogRate +
                 ", dateOfBirth=" + dateOfBirth +
                 ", genderTypeCode='" + genderTypeCode + '\'' +
+                ", memberEmails=" + memberEmails +
+                ", memberPhones=" + memberPhones +
+                ", memberIdentifiers=" + memberIdentifiers +
+                ", memberLanguages=" + memberLanguages +
+                ", memberAddresses=" + memberAddresses +
+                ", alternateContacts=" + alternateContacts +
                 ", createdDate=" + createdDate +
                 ", updatedDate=" + updatedDate +
                 '}';

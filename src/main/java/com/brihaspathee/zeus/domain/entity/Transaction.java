@@ -143,6 +143,15 @@ public class Transaction {
                 ", zfcn='" + zfcn + '\'' +
                 ", transactionReceivedDate=" + transactionReceivedDate +
                 ", transactionSourceTypeCode='" + transactionSourceTypeCode + '\'' +
+                ", transactionDetail=" + transactionDetail +
+                ", tradingPartner=" + tradingPartner +
+                ", transactionRates=" + transactionRates +
+                ", transactionAttributes=" + transactionAttributes +
+                ", payer=" + payer +
+                ", sponsor=" + sponsor +
+                ", broker=" + broker +
+                ", transactionStatus=" + transactionStatus +
+                ", members=" + members +
                 ", createdDate=" + createdDate +
                 ", updatedDate=" + updatedDate +
                 '}';

@@ -5,6 +5,7 @@ import com.brihaspathee.zeus.broker.producer.TransactionValidationProducer;
 import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
+import com.brihaspathee.zeus.service.interfaces.TransactionService;
 import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
 import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,12 +39,18 @@ public class TransactionProcessorImpl implements TransactionProcessor {
     private final AccountProducer accountProducer;
 
     /**
+     * Transaction service instance to create the record
+     */
+    private final TransactionService transactionService;
+
+    /**
      * Process transaction
      * @param dataTransformationDto
      */
     @Override
     public Mono<Void> processTransaction(DataTransformationDto dataTransformationDto) throws JsonProcessingException {
         log.info("Transaction received for processing:{}", dataTransformationDto);
+        transactionService.createTransaction(dataTransformationDto);
 //        transactionValidationProducer.publishTransaction(dataTransformationDto.getTransactionDto());
 //        AccountDto accountDto = AccountDto.builder()
 //                .accountNumber(ZeusRandomStringGenerator.randomString(15))

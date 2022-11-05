@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `transactionmanagerdb`.`transaction` (
     `transaction_received_date` DATETIME NOT NULL,
     `transaction_source_type_code` VARCHAR(50) NOT NULL,
     `created_date` DATETIME NULL,
-    `updated_date` DATETIME NOT NULL,
+    `updated_date` DATETIME NULL,
     PRIMARY KEY (`transaction_sk`))
     ENGINE = InnoDB
     COMMENT = 'Top level transaction table for each of the transactions';
@@ -326,7 +326,7 @@ CREATE TABLE IF NOT EXISTS `transactionmanagerdb`.`alternate_contact` (
     `alternate_contact_sk` VARCHAR(36) NOT NULL COMMENT 'Primary key of the table',
     `member_sk` VARCHAR(36) NOT NULL COMMENT 'The alternate contact received for the member',
     `alternate_contact_type_code` VARCHAR(50) NOT NULL COMMENT 'The type of alternate contact',
-    `first_name` VARCHAR(100) NOT NULL COMMENT 'The first name of the alternate contact',
+    `first_name` VARCHAR(100) NULL COMMENT 'The first name of the alternate contact',
     `middle_name` VARCHAR(50) NULL COMMENT 'The middle name of the alternate contact',
     `last_name` VARCHAR(100) NOT NULL COMMENT 'The last name of the alternate contact',
     `identifier_type_code` VARCHAR(50) NULL COMMENT 'The type of identifier received for the alternate contact',

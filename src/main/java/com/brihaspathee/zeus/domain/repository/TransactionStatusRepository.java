@@ -1,9 +1,11 @@
 package com.brihaspathee.zeus.domain.repository;
 
+import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.domain.entity.TransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -17,4 +19,11 @@ import java.util.UUID;
  */
 @Repository
 public interface TransactionStatusRepository extends JpaRepository<TransactionStatus, UUID> {
+
+    /**
+     * Get the maximum transaction status for the transaction
+     * @param transaction
+     * @return
+     */
+    Optional<TransactionStatus> findFirstByTransactionOrderByStatusSeqDesc(Transaction transaction);
 }

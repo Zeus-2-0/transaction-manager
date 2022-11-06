@@ -1,6 +1,7 @@
 package com.brihaspathee.zeus.helper.interfaces;
 
 import com.brihaspathee.zeus.domain.entity.Member;
+import com.brihaspathee.zeus.domain.entity.MemberEmail;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberEmailDto;
 
 import java.util.List;
@@ -16,5 +17,5 @@ import java.util.List;
  */
 public interface MemberEmailHelper {
 
-    void createMemberEmail(List<TransactionMemberEmailDto> emailDtos, Member member);
+    List<MemberEmail> createMemberEmail(List<TransactionMemberEmailDto> emailDtos, Member member);
 }

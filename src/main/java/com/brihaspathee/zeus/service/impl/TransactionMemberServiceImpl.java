@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -73,20 +74,40 @@ public class TransactionMemberServiceImpl implements TransactionMemberService {
      * @param memberDtos
      */
     @Override
-    public void createMember(List<TransactionMemberDto> memberDtos,
+    public List<Member> createMember(List<TransactionMemberDto> memberDtos,
                              Transaction transaction) {
+        List<Member> members = new ArrayList<>();
         memberDtos.stream().forEach(memberDto -> {
             Member member = memberMapper.memberDtoMember(memberDto);
             member.setTransaction(transaction);
             member.setTransactionMemberCode(ZeusRandomStringGenerator.randomString(15));
             member = memberRepository.save(member);
-            phoneHelper.createMemberPhones(memberDto.getMemberPhones(), member);
-            addressHelper.createMemberAddress(memberDto.getMemberAddresses(), member);
-            identifierHelper.createMemberIdentifier(memberDto.getIdentifiers(), member);
-            emailHelper.createMemberEmail(memberDto.getEmails(), member);
-            languageHelper.createMemberLanguage(memberDto.getLanguages(), member);
-            alternateContactHelper.createAlternateContact(memberDto.getAlternateContacts(), member);
+            member.setMemberPhones(
+                    phoneHelper.createMemberPhones(
+                            memberDto.getMemberPhones(),
+                            member));
+            member.setMemberAddresses(
+                    addressHelper.createMemberAddress(
+                            memberDto.getMemberAddresses(),
+                            member));
+            member.setMemberIdentifiers(
+                    identifierHelper.createMemberIdentifier(
+                            memberDto.getIdentifiers(),
+                            member));
+            member.setMemberEmails(
+                    emailHelper.createMemberEmail(
+                            memberDto.getEmails(),
+                            member));
+            member.setMemberLanguages(
+                    languageHelper.createMemberLanguage(
+                            memberDto.getLanguages(),
+                            member));
+            member.setAlternateContacts(
+                    alternateContactHelper.createAlternateContact(
+                            memberDto.getAlternateContacts(),
+                            member));
+            members.add(member);
         });
-
+        return members;
     }
 }

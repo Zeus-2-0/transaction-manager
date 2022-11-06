@@ -40,12 +40,14 @@ public class BrokerHelperImpl implements BrokerHelper {
      * @param transaction
      */
     @Override
-    public void createBroker(TransactionBrokerDto brokerDto,
+    public Broker createBroker(TransactionBrokerDto brokerDto,
                              Transaction transaction) {
         if(brokerDto != null){
             Broker broker = brokerMapper.brokerDtoToBroker(brokerDto);
             broker.setTransaction(transaction);
-            brokerRepository.save(broker);
+            return brokerRepository.save(broker);
+        }else{
+            return null;
         }
 
     }

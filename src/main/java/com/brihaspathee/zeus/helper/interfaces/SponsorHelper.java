@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.helper.interfaces;
 
+import com.brihaspathee.zeus.domain.entity.Sponsor;
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.dto.transaction.TransactionSponsorDto;
 
@@ -19,6 +20,6 @@ public interface SponsorHelper {
      * @param sponsorDto
      * @param transaction
      */
-    void createSponsor(TransactionSponsorDto sponsorDto,
-                       Transaction transaction);
+    Sponsor createSponsor(TransactionSponsorDto sponsorDto,
+                          Transaction transaction);
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,14 +43,20 @@ public class TransactionAttributesHelperImpl implements TransactionAttributesHel
      * @param transaction
      */
     @Override
-    public void createTransactionAttributes(List<TransactionAttributeDto> attributeDtos,
+    public List<TransactionAttributes> createTransactionAttributes(List<TransactionAttributeDto> attributeDtos,
                                             Transaction transaction) {
+        List<TransactionAttributes> attributes = new ArrayList<>();
         if(attributeDtos != null && attributeDtos.size() > 0){
             attributeDtos.stream().forEach(attributeDto -> {
                 TransactionAttributes attribute = attributesMapper.attributeDtoToAttribute(attributeDto);
                 attribute.setTransaction(transaction);
-                attributesRepository.save(attribute);
+                attributes.add(attributesRepository.save(attribute));
             });
+        }
+        if(attributes.size() > 0){
+            return attributes;
+        }else {
+            return null;
         }
     }
 }

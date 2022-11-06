@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,13 +43,19 @@ public class MemberIdentifierHelperImpl implements MemberIdentifierHelper {
      * @param member
      */
     @Override
-    public void createMemberIdentifier(List<TransactionMemberIdentifierDto> identifierDtos, Member member) {
+    public List<MemberIdentifier> createMemberIdentifier(List<TransactionMemberIdentifierDto> identifierDtos, Member member) {
+        List<MemberIdentifier> identifiers = new ArrayList<>();
         if(identifierDtos != null && identifierDtos.size() > 0){
             identifierDtos.stream().forEach(identifierDto -> {
                 MemberIdentifier identifier = identifierMapper.identifierDtoToIdentifier(identifierDto);
                 identifier.setMember(member);
-                identifierRepository.save(identifier);
+                identifiers.add(identifierRepository.save(identifier));
             });
+        }
+        if(identifiers.size() > 0){
+            return identifiers;
+        }else {
+            return null;
         }
     }
 }

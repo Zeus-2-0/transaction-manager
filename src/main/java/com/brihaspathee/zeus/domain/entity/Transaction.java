@@ -66,7 +66,7 @@ public class Transaction {
     /**
      * Contains the details of the transaction
      */
-    @OneToOne(mappedBy = "transaction")
+    @OneToOne(mappedBy = "transaction", fetch = FetchType.EAGER)
     private TransactionDetail transactionDetail;
 
     /**
@@ -114,7 +114,7 @@ public class Transaction {
     /**
      * Contains the members of the transaction
      */
-    @OneToMany(mappedBy = "transaction")
+    @OneToMany(mappedBy = "transaction", fetch = FetchType.EAGER)
     private List<Member> members;
 
     /**

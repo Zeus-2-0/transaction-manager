@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.helper.interfaces;
 
+import com.brihaspathee.zeus.domain.entity.Payer;
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.dto.transaction.TransactionPayerDto;
 
@@ -19,6 +20,6 @@ public interface PayerHelper {
      * @param payerDto
      * @param transaction
      */
-    void createPayer(TransactionPayerDto payerDto,
-                     Transaction transaction);
+    Payer createPayer(TransactionPayerDto payerDto,
+                      Transaction transaction);
 }

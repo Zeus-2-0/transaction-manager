@@ -3,6 +3,8 @@ package com.brihaspathee.zeus.helper.interfaces;
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.domain.entity.TransactionStatus;
 
+import java.util.List;
+
 /**
  * Created in Intellij IDEA
  * User: Balaji Varadharajan
@@ -20,7 +22,7 @@ public interface TransactionStatusHelper {
      * @param transactionStatus
      * @param transactionProcessingStatus
      */
-    void createStatus(String transactionStatus,
+    List<TransactionStatus> createStatus(String transactionStatus,
                       String transactionProcessingStatus,
                       Transaction transaction);
 }

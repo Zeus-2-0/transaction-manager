@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,14 +43,19 @@ public class MemberLanguageHelperImpl implements MemberLanguageHelper {
      * @param member
      */
     @Override
-    public void createMemberLanguage(List<TransactionMemberLanguageDto> languageDtos, Member member) {
+    public List<MemberLanguage> createMemberLanguage(List<TransactionMemberLanguageDto> languageDtos, Member member) {
+        List<MemberLanguage> languages = new ArrayList<>();
         if(languageDtos != null && languageDtos.size() > 0){
             languageDtos.stream().forEach(languageDto -> {
                 MemberLanguage language = languageMapper.languageDtoToLanguage(languageDto);
                 language.setMember(member);
-                languageRepository.save(language);
+                languages.add(languageRepository.save(language));
             });
         }
-
+        if(languages.size() > 0){
+            return languages;
+        }else{
+            return null;
+        }
     }
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,13 +43,19 @@ public class MemberPhoneHelperImpl implements MemberPhoneHelper {
      * @param member
      */
     @Override
-    public void createMemberPhones(List<TransactionMemberPhoneDto> phoneDtos, Member member) {
+    public List<MemberPhone> createMemberPhones(List<TransactionMemberPhoneDto> phoneDtos, Member member) {
+        List<MemberPhone> phones = new ArrayList<>();
         if(phoneDtos != null && phoneDtos.size() > 0){
             phoneDtos.stream().forEach(phoneDto -> {
                 MemberPhone phone = phoneMapper.phoneDtoToPhone(phoneDto);
                 phone.setMember(member);
-                phoneRepository.save(phone);
+                phones.add(phoneRepository.save(phone));
             });
+        }
+        if(phones.size() > 0){
+            return phones;
+        }else{
+            return null;
         }
     }
 }

@@ -41,12 +41,14 @@ public class TransactionDetailHelperImpl implements TransactionDetailHelper {
      * @param transaction
      */
     @Override
-    public void createTransactionDetail(TransactionDetailDto detailDto,
+    public TransactionDetail createTransactionDetail(TransactionDetailDto detailDto,
                                         Transaction transaction) {
         if(detailDto != null){
             TransactionDetail detail = detailMapper.detailDtoToDetail(detailDto);
             detail.setTransaction(transaction);
-            detailRepository.save(detail);
+            return detailRepository.save(detail);
+        }else{
+            return null;
         }
 
     }

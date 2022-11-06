@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,13 +43,19 @@ public class TransactionRateHelperImpl implements TransactionRateHelper {
      * @param transaction
      */
     @Override
-    public void createTransactionRates(List<TransactionRateDto> rateDtos, Transaction transaction) {
+    public List<TransactionRate> createTransactionRates(List<TransactionRateDto> rateDtos, Transaction transaction) {
+        List<TransactionRate> rates = new ArrayList<>();
         if(rateDtos != null && rateDtos.size() >0){
             rateDtos.stream().forEach(rateDto -> {
                 TransactionRate rate = rateMapper.rateDtoToRate(rateDto);
                 rate.setTransaction(transaction);
-                rateRepository.save(rate);
+                rates.add(rateRepository.save(rate));
             });
+        }
+        if(rates.size() > 0){
+            return rates;
+        }else {
+            return null;
         }
     }
 }

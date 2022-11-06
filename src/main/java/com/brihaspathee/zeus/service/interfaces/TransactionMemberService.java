@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.service.interfaces;
 
+import com.brihaspathee.zeus.domain.entity.Member;
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 
@@ -21,6 +22,6 @@ public interface TransactionMemberService {
      * @param memberDtos
      * @param transaction
      */
-    void createMember(List<TransactionMemberDto> memberDtos,
-                      Transaction transaction);
+    List<Member> createMember(List<TransactionMemberDto> memberDtos,
+                              Transaction transaction);
 }

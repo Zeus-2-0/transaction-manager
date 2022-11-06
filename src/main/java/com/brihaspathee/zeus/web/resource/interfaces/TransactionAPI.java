@@ -1,6 +1,7 @@
 package com.brihaspathee.zeus.web.resource.interfaces;
 
 import com.brihaspathee.zeus.dto.account.AccountDto;
+import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.exception.ApiExceptionList;
 import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import com.brihaspathee.zeus.web.response.ZeusApiResponse;
@@ -13,9 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -63,4 +62,29 @@ public interface TransactionAPI {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<ZeusApiResponse<DataTransformationDto>> createTransaction(
             @RequestBody @Valid DataTransformationDto dataTransformationDto) throws JsonProcessingException;
+
+    /**
+     * Get the transaction related to the zeus transaction control number that is passed in as input
+     * @param ztcn
+     * @return
+     */
+    @Operation(
+            operationId = "Get Transaction by ZTCN",
+            method = "GET",
+            description = "Get the details of the transaction by its ZTCN",
+            tags = {"transaction"}
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully retrieved the details of the transaction",
+                            content = {
+                                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = TransactionDto.class))
+                            }
+                    )
+            }
+    )
+    @GetMapping("/{ztcn}")
+    ResponseEntity<ZeusApiResponse<TransactionDto>> getTransactionByZtcn(@PathVariable("ztcn") String ztcn);
 }

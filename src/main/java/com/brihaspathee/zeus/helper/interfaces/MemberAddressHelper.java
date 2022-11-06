@@ -17,5 +17,5 @@ import java.util.List;
  */
 public interface MemberAddressHelper {
 
-    void createMemberAddress(List<TransactionMemberAddressDto> addressDtos, Member member);
+    List<MemberAddress> createMemberAddress(List<TransactionMemberAddressDto> addressDtos, Member member);
 }

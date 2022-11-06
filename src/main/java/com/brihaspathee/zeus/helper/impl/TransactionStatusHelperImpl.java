@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -43,8 +45,18 @@ public class TransactionStatusHelperImpl implements TransactionStatusHelper {
      * @param transaction
      */
     @Override
-    public void createStatus(String transactionStatus, String transactionProcessingStatus, Transaction transaction) {
-        Optional<TransactionStatus> status = statusRepository.findFirstByTransactionOrderByStatusSeqDesc(transaction);
+    public List<TransactionStatus> createStatus(String transactionStatus,
+                             String transactionProcessingStatus,
+                             Transaction transaction) {
+//        Optional<TransactionStatus> status =
+//                statusRepository.findFirstByTransactionOrderByStatusSeqDesc(transaction);
+        List<TransactionStatus> statuses = statusRepository.findAllByTransaction(transaction);
+        Optional<TransactionStatus> status = statuses
+                .stream()
+                .max(
+                        Comparator.comparing(TransactionStatus :: getStatusSeq))
+                .stream()
+                .findFirst();
         if(status.isEmpty()){
             TransactionStatus newStatus = TransactionStatus.builder()
                     .transaction(transaction)
@@ -52,7 +64,7 @@ public class TransactionStatusHelperImpl implements TransactionStatusHelper {
                     .transactionStatusTypeCode(transactionStatus)
                     .processingStatusTypeCode(transactionProcessingStatus)
                     .build();
-            statusRepository.save(newStatus);
+            statuses.add(statusRepository.save(newStatus));
         }else{
             TransactionStatus newStatus = TransactionStatus.builder()
                     .transaction(transaction)
@@ -60,7 +72,8 @@ public class TransactionStatusHelperImpl implements TransactionStatusHelper {
                     .transactionStatusTypeCode(transactionStatus)
                     .processingStatusTypeCode(transactionProcessingStatus)
                     .build();
-            statusRepository.save(newStatus);
+            statuses.add(statusRepository.save(newStatus));
         }
+        return statuses;
     }
 }

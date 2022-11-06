@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,13 +43,19 @@ public class AlternateContactHelperImpl implements AlternateContactHelper {
      * @param member
      */
     @Override
-    public void createAlternateContact(List<TransactionAlternateContactDto> alternateContactDtos, Member member) {
+    public List<AlternateContact> createAlternateContact(List<TransactionAlternateContactDto> alternateContactDtos, Member member) {
+        List<AlternateContact> alternateContacts = new ArrayList<>();
         if(alternateContactDtos != null && alternateContactDtos.size() >0){
             alternateContactDtos.stream().forEach(alternateContactDto -> {
                 AlternateContact alternateContact = alternateContactMapper.contactDtoToContact(alternateContactDto);
                 alternateContact.setMember(member);
-                alternateContactRepository.save(alternateContact);
+                alternateContacts.add(alternateContactRepository.save(alternateContact));
             });
+        }
+        if (alternateContacts.size() > 0){
+            return alternateContacts;
+        }else {
+            return null;
         }
 
     }

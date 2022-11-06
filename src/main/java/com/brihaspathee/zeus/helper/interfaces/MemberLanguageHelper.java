@@ -1,6 +1,7 @@
 package com.brihaspathee.zeus.helper.interfaces;
 
 import com.brihaspathee.zeus.domain.entity.Member;
+import com.brihaspathee.zeus.domain.entity.MemberLanguage;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberLanguageDto;
 
 import java.util.List;
@@ -16,5 +17,5 @@ import java.util.List;
  */
 public interface MemberLanguageHelper {
 
-    void createMemberLanguage(List<TransactionMemberLanguageDto> languageDtos, Member member);
+    List<MemberLanguage> createMemberLanguage(List<TransactionMemberLanguageDto> languageDtos, Member member);
 }

@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.service.interfaces;
 
+import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.web.model.DataTransformationDto;
 
 /**
@@ -13,5 +14,17 @@ import com.brihaspathee.zeus.web.model.DataTransformationDto;
  */
 public interface TransactionService {
 
-    void createTransaction(DataTransformationDto dataTransformationDto);
+    /**
+     * Create transaction
+     * @param dataTransformationDto
+     * @return
+     */
+    TransactionDto createTransaction(DataTransformationDto dataTransformationDto);
+
+    /**
+     * Get transaction by ztcn
+     * @param ztcn
+     * @return
+     */
+    TransactionDto getTransactionByZtcn(String ztcn);
 }

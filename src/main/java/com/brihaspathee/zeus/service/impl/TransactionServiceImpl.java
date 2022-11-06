@@ -83,7 +83,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @param dataTransformationDto
      */
     @Override
-    public void createTransaction(DataTransformationDto dataTransformationDto) {
+    public TransactionDto createTransaction(DataTransformationDto dataTransformationDto) {
         TransactionDto transactionDto = dataTransformationDto.getTransactionDto();
         // Transaction transaction = transactionMapper.transactionDtoToTransaction(transactionDto);
         // log.info("Transaction Entity:{}", transaction);
@@ -94,13 +94,50 @@ public class TransactionServiceImpl implements TransactionService {
                         .transactionReceivedDate(transactionDto.getTransactionReceivedDate())
                 .build());
         log.info("Transaction SK created:{}", transaction.getTransactionSK());
-        statusHelper.createStatus("RECEIVED", "RECEIVED", transaction);
-        detailHelper.createTransactionDetail(transactionDto.getTransactionDetail(), transaction);
-        payerHelper.createPayer(transactionDto.getPayer(), transaction);
-        sponsorHelper.createSponsor(transactionDto.getSponsor(), transaction);
-        brokerHelper.createBroker(transactionDto.getBroker(), transaction);
-        attributesHelper.createTransactionAttributes(transactionDto.getTransactionAttributes(), transaction);
-        rateHelper.createTransactionRates(transactionDto.getTransactionRates(), transaction);
-        memberService.createMember(transactionDto.getMembers(), transaction);
+        transaction.setTransactionStatus(
+                statusHelper.createStatus(
+                        "RECEIVED",
+                        "RECEIVED",
+                        transaction));
+        transaction.setTransactionDetail(
+                detailHelper.createTransactionDetail(
+                        transactionDto.getTransactionDetail(),
+                        transaction));
+        transaction.setPayer(
+                payerHelper.createPayer(
+                        transactionDto.getPayer(),
+                        transaction));
+        transaction.setSponsor(
+                sponsorHelper.createSponsor(
+                        transactionDto.getSponsor(),
+                        transaction));
+        transaction.setBroker(
+                brokerHelper.createBroker(
+                        transactionDto.getBroker(),
+                        transaction));
+        transaction.setTransactionAttributes(
+                attributesHelper.createTransactionAttributes(
+                        transactionDto.getTransactionAttributes(),
+                        transaction));
+        transaction.setTransactionRates(
+                rateHelper.createTransactionRates(
+                        transactionDto.getTransactionRates(),
+                        transaction));
+        transaction.setMembers(
+                memberService.createMember(
+                        transactionDto.getMembers(),
+                        transaction));
+        return transactionMapper.transactionToTransactionDto(transaction);
+    }
+
+    /**
+     * Get transaction by ztcn
+     * @param ztcn
+     * @return
+     */
+    @Override
+    public TransactionDto getTransactionByZtcn(String ztcn) {
+        return transactionMapper.transactionToTransactionDto(
+                transactionRepository.findByZtcn(ztcn).get());
     }
 }

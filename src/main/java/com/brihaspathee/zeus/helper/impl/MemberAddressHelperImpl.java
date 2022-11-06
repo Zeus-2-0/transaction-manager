@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,11 +43,19 @@ public class MemberAddressHelperImpl implements MemberAddressHelper {
      * @param member
      */
     @Override
-    public void createMemberAddress(List<TransactionMemberAddressDto> addressDtos, Member member) {
-        addressDtos.stream().forEach(addressDto -> {
-            MemberAddress address = addressMapper.addressDtoToAddress(addressDto);
-            address.setMember(member);
-            addressRepository.save(address);
-        });
+    public List<MemberAddress> createMemberAddress(List<TransactionMemberAddressDto> addressDtos, Member member) {
+        List<MemberAddress> addresses = new ArrayList<>();
+        if(addressDtos != null && addressDtos.size() >0){
+            addressDtos.stream().forEach(addressDto -> {
+                MemberAddress address = addressMapper.addressDtoToAddress(addressDto);
+                address.setMember(member);
+                addresses.add(addressRepository.save(address));
+            });
+        }
+        if(addresses.size() > 0){
+            return addresses;
+        }else {
+            return null;
+        }
     }
 }

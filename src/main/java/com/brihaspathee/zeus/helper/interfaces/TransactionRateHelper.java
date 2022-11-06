@@ -1,6 +1,7 @@
 package com.brihaspathee.zeus.helper.interfaces;
 
 import com.brihaspathee.zeus.domain.entity.Transaction;
+import com.brihaspathee.zeus.domain.entity.TransactionRate;
 import com.brihaspathee.zeus.dto.transaction.TransactionRateDto;
 
 import java.util.List;
@@ -21,6 +22,6 @@ public interface TransactionRateHelper {
      * @param rateDtos
      * @param transaction
      */
-    void createTransactionRates(List<TransactionRateDto> rateDtos,
-                                Transaction transaction);
+    List<TransactionRate> createTransactionRates(List<TransactionRateDto> rateDtos,
+                                                 Transaction transaction);
 }

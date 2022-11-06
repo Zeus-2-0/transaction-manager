@@ -1,6 +1,7 @@
 package com.brihaspathee.zeus.helper.interfaces;
 
 import com.brihaspathee.zeus.domain.entity.Transaction;
+import com.brihaspathee.zeus.domain.entity.TransactionDetail;
 import com.brihaspathee.zeus.dto.transaction.TransactionDetailDto;
 
 /**
@@ -19,6 +20,6 @@ public interface TransactionDetailHelper {
      * @param detailDto
      * @param transaction
      */
-    void createTransactionDetail(TransactionDetailDto detailDto,
-                                 Transaction transaction);
+    TransactionDetail createTransactionDetail(TransactionDetailDto detailDto,
+                                              Transaction transaction);
 }

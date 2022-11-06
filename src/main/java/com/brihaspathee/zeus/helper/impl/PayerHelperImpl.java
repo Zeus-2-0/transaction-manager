@@ -40,12 +40,14 @@ public class PayerHelperImpl implements PayerHelper {
      * @param transaction
      */
     @Override
-    public void createPayer(TransactionPayerDto payerDto,
+    public Payer createPayer(TransactionPayerDto payerDto,
                             Transaction transaction) {
         if(payerDto !=null){
             Payer payer = payerMapper.payerDtoToPayer(payerDto);
             payer.setTransaction(transaction);
-            payerRepository.save(payer);
+            return payerRepository.save(payer);
+        }else {
+            return null;
         }
     }
 }

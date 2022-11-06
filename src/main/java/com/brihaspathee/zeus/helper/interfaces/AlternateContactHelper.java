@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.helper.interfaces;
 
+import com.brihaspathee.zeus.domain.entity.AlternateContact;
 import com.brihaspathee.zeus.domain.entity.Member;
 import com.brihaspathee.zeus.dto.transaction.TransactionAlternateContactDto;
 
@@ -16,5 +17,5 @@ import java.util.List;
  */
 public interface AlternateContactHelper {
 
-    void createAlternateContact(List<TransactionAlternateContactDto> alternateContactDtos, Member member);
+    List<AlternateContact> createAlternateContact(List<TransactionAlternateContactDto> alternateContactDtos, Member member);
 }

@@ -50,7 +50,8 @@ public class TransactionProcessorImpl implements TransactionProcessor {
     @Override
     public Mono<Void> processTransaction(DataTransformationDto dataTransformationDto) throws JsonProcessingException {
         log.info("Transaction received for processing:{}", dataTransformationDto);
-        transactionService.createTransaction(dataTransformationDto);
+        TransactionDto transactionDto = transactionService.createTransaction(dataTransformationDto);
+        log.info("Transaction after inserting to tables:{}", transactionDto);
 //        transactionValidationProducer.publishTransaction(dataTransformationDto.getTransactionDto());
 //        AccountDto accountDto = AccountDto.builder()
 //                .accountNumber(ZeusRandomStringGenerator.randomString(15))

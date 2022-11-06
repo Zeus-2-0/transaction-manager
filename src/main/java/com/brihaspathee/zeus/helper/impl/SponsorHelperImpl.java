@@ -40,11 +40,13 @@ public class SponsorHelperImpl implements SponsorHelper {
      * @param transaction
      */
     @Override
-    public void createSponsor(TransactionSponsorDto sponsorDto, Transaction transaction) {
+    public Sponsor createSponsor(TransactionSponsorDto sponsorDto, Transaction transaction) {
         if(sponsorDto != null){
             Sponsor sponsor = sponsorMapper.sponsorDtoToSponsor(sponsorDto);
             sponsor.setTransaction(transaction);
-            sponsorRepository.save(sponsor);
+            return sponsorRepository.save(sponsor);
+        }else{
+            return null;
         }
     }
 }

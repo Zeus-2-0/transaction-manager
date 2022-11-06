@@ -17,5 +17,5 @@ import java.util.List;
  */
 public interface MemberIdentifierHelper {
 
-    void createMemberIdentifier(List<TransactionMemberIdentifierDto> identifierDtos, Member member);
+    List<MemberIdentifier> createMemberIdentifier(List<TransactionMemberIdentifierDto> identifierDtos, Member member);
 }

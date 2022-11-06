@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,15 +43,20 @@ public class MemberEmailHelperImpl implements MemberEmailHelper {
      * @param member
      */
     @Override
-    public void createMemberEmail(List<TransactionMemberEmailDto> emailDtos,
+    public List<MemberEmail> createMemberEmail(List<TransactionMemberEmailDto> emailDtos,
                                   Member member) {
+        List<MemberEmail> emails = new ArrayList<>();
         if(emailDtos != null && emailDtos.size() > 0){
             emailDtos.stream().forEach(emailDto -> {
                 MemberEmail email = emailMapper.emailDtoToEmail(emailDto);
                 email.setMember(member);
-                emailRepository.save(email);
+                emails.add(emailRepository.save(email));
             });
         }
-
+        if(emails.size() > 0){
+            return emails;
+        }else {
+            return null;
+        }
     }
 }

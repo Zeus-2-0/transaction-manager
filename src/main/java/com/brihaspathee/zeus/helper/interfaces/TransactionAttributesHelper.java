@@ -1,6 +1,7 @@
 package com.brihaspathee.zeus.helper.interfaces;
 
 import com.brihaspathee.zeus.domain.entity.Transaction;
+import com.brihaspathee.zeus.domain.entity.TransactionAttributes;
 import com.brihaspathee.zeus.dto.transaction.TransactionAttributeDto;
 
 import java.util.List;
@@ -21,6 +22,6 @@ public interface TransactionAttributesHelper {
      * @param attributeDtos
      * @param transaction
      */
-    void createTransactionAttributes(List<TransactionAttributeDto> attributeDtos,
-                                     Transaction transaction);
+    List<TransactionAttributes> createTransactionAttributes(List<TransactionAttributeDto> attributeDtos,
+                                                            Transaction transaction);
 }

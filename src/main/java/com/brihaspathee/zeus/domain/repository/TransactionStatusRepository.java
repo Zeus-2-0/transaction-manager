@@ -5,6 +5,7 @@ import com.brihaspathee.zeus.domain.entity.TransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,4 +27,11 @@ public interface TransactionStatusRepository extends JpaRepository<TransactionSt
      * @return
      */
     Optional<TransactionStatus> findFirstByTransactionOrderByStatusSeqDesc(Transaction transaction);
+
+    /**
+     * Find all the statuses of the transaction
+     * @param transaction
+     * @return
+     */
+    List<TransactionStatus> findAllByTransaction(Transaction transaction);
 }

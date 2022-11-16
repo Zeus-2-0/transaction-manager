@@ -52,7 +52,7 @@ public class TransactionProcessorImpl implements TransactionProcessor {
         log.info("Transaction received for processing:{}", dataTransformationDto);
         TransactionDto transactionDto = transactionService.createTransaction(dataTransformationDto);
         log.info("Transaction after inserting to tables:{}", transactionDto);
-//        transactionValidationProducer.publishTransaction(dataTransformationDto.getTransactionDto());
+        transactionValidationProducer.publishTransaction(transactionDto);
 //        AccountDto accountDto = AccountDto.builder()
 //                .accountNumber(ZeusRandomStringGenerator.randomString(15))
 //                .lineOfBusinessTypeCode(dataTransformationDto.getTransactionDto().getTradingPartnerDto().getLineOfBusinessTypeCode())

@@ -79,7 +79,9 @@ public class TransactionValidationListener {
         ZeusMessagePayload<TransactionValidationResult> transactionValidationResultPayload =
                 objectMapper.readValue(valueAsString,
                         new TypeReference<ZeusMessagePayload<TransactionValidationResult>>() {});
+
         createPayloadTrackerRespDetail(transactionValidationResultPayload);
+        log.info("Validation Response:{}", transactionValidationResultPayload.getPayload());
 
     }
 

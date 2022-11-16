@@ -2,6 +2,7 @@ package com.brihaspathee.zeus.web.resource.impl;
 
 import com.brihaspathee.zeus.constants.ApiResponseConstants;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
+import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
 import com.brihaspathee.zeus.service.interfaces.TransactionService;
 import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import com.brihaspathee.zeus.web.resource.interfaces.TransactionAPI;
@@ -35,6 +36,11 @@ public class TransactionAPIImpl implements TransactionAPI {
     private final TransactionService transactionService;
 
     /**
+     * Transaction Processor instance
+     */
+    private final TransactionProcessor transactionProcessor;
+
+    /**
      * Create the transaction
      * @param dataTransformationDto
      * @return
@@ -43,8 +49,9 @@ public class TransactionAPIImpl implements TransactionAPI {
     @Override
     public ResponseEntity<ZeusApiResponse<DataTransformationDto>> createTransaction(
             DataTransformationDto dataTransformationDto) throws JsonProcessingException {
-        TransactionDto transactionDto = transactionService.createTransaction(dataTransformationDto);
-        log.info("Transaction after processing:{}", transactionDto);
+        transactionProcessor.processTransaction(dataTransformationDto);
+        // TransactionDto transactionDto = transactionService.createTransaction(dataTransformationDto);
+        // log.info("Transaction after processing:{}", transactionDto);
         return null;
     }
 

@@ -1,12 +1,11 @@
 package com.brihaspathee.zeus.broker.consumer;
 
+import com.brihaspathee.zeus.broker.message.AccountProcessingResponse;
 import com.brihaspathee.zeus.domain.entity.PayloadTrackerDetail;
 import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerDetailHelper;
 import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerHelper;
 import com.brihaspathee.zeus.message.Acknowledgement;
 import com.brihaspathee.zeus.message.ZeusMessagePayload;
-import com.brihaspathee.zeus.validator.AccountProcessingResponse;
-import com.brihaspathee.zeus.validator.AccountValidationResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AccountListener {
+public class AccountProcessingListener {
 
     /**
      * Object mapper instance to convert the JSON to object

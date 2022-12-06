@@ -40,6 +40,7 @@ public class TradingPartnerMapperImpl implements TradingPartnerMapper {
                 .lineOfBusinessTypeCode(tradingPartner.getLineOfBusinessTypeCode())
                 .businessTypeCode(tradingPartner.getBusinessUnitTypeCode())
                 .marketplaceTypeCode(tradingPartner.getMarketplaceTypeCode())
+                .stateTypeCode(tradingPartner.getStateTypeCode())
                 .createdDate(tradingPartner.getCreatedDate())
                 .updatedDate(tradingPartner.getUpdatedDate())
                 .build();
@@ -62,6 +63,7 @@ public class TradingPartnerMapperImpl implements TradingPartnerMapper {
                 .lineOfBusinessTypeCode(tradingPartnerDto.getLineOfBusinessTypeCode())
                 .businessUnitTypeCode(tradingPartnerDto.getBusinessTypeCode())
                 .marketplaceTypeCode(tradingPartnerDto.getMarketplaceTypeCode())
+                .stateTypeCode(tradingPartnerDto.getStateTypeCode())
                 .createdDate(tradingPartnerDto.getCreatedDate())
                 .updatedDate(tradingPartnerDto.getUpdatedDate())
                 .build();

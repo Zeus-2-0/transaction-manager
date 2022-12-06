@@ -1,7 +1,7 @@
 package com.brihaspathee.zeus.broker.producer;
 
-import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.message.ZeusMessagePayload;
+import com.brihaspathee.zeus.broker.message.AccountProcessingRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -24,13 +24,13 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 @Setter
 @Component
 @RequiredArgsConstructor
-public class AccountCreationCallback implements
-        ListenableFutureCallback<SendResult<String, ZeusMessagePayload<AccountDto>>> {
+public class AccountProcessorCallback implements
+        ListenableFutureCallback<SendResult<String, ZeusMessagePayload<AccountProcessingRequest>>> {
 
     /**
      * The message that was sent in the Kafka topic
      */
-    private AccountDto accountDto;
+    private AccountProcessingRequest accountProcessingRequest;
 
     /**
      * Invoked when there is failure to post the message to the topic
@@ -46,7 +46,7 @@ public class AccountCreationCallback implements
      * @param result
      */
     @Override
-    public void onSuccess(SendResult<String, ZeusMessagePayload<AccountDto>> result) {
+    public void onSuccess(SendResult<String, ZeusMessagePayload<AccountProcessingRequest>> result) {
         log.info("The message successfully published");
     }
 }

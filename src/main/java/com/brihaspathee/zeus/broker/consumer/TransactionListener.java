@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.broker.consumer;
 
+import com.brihaspathee.zeus.constants.ZeusServiceNames;
 import com.brihaspathee.zeus.domain.entity.PayloadTracker;
 import com.brihaspathee.zeus.domain.entity.PayloadTrackerDetail;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
@@ -121,12 +122,12 @@ public class TransactionListener {
     private ZeusMessagePayload<Acknowledgement> createAcknowledgment(
             ZeusMessagePayload<DataTransformationDto> messagePayload,
             PayloadTracker payloadTracker) throws JsonProcessingException {
-        String[] messageDestinations = {"DATA-TRANSFORM-SERVICE"};
+        String[] messageDestinations = {ZeusServiceNames.DATA_TRANSFORM_SERVICE};
         String ackId = ZeusRandomStringGenerator.randomString(15);
         ZeusMessagePayload<Acknowledgement> ack = ZeusMessagePayload.<Acknowledgement>builder()
                 .messageMetadata(MessageMetadata.builder()
                         .messageDestination(messageDestinations)
-                        .messageSource("TRANSACTION-MANAGER")
+                        .messageSource(ZeusServiceNames.TRANSACTION_MANAGER)
                         .messageCreationTimestamp(LocalDateTime.now())
                         .build())
                 .payload(Acknowledgement.builder()

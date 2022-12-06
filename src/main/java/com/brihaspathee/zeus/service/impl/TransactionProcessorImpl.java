@@ -1,12 +1,11 @@
 package com.brihaspathee.zeus.service.impl;
 
-import com.brihaspathee.zeus.broker.producer.AccountProducer;
+import com.brihaspathee.zeus.broker.producer.AccountProcessingProducer;
 import com.brihaspathee.zeus.broker.producer.TransactionValidationProducer;
-import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
 import com.brihaspathee.zeus.service.interfaces.TransactionService;
-import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
+import com.brihaspathee.zeus.broker.message.AccountProcessingRequest;
 import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class TransactionProcessorImpl implements TransactionProcessor {
     /**
      * Account producer instance to send the message to the member management service
      */
-    private final AccountProducer accountProducer;
+    private final AccountProcessingProducer accountProcessingProducer;
 
     /**
      * Transaction service instance to create the record
@@ -53,11 +52,11 @@ public class TransactionProcessorImpl implements TransactionProcessor {
         TransactionDto transactionDto = transactionService.createTransaction(dataTransformationDto);
         log.info("Transaction after inserting to tables:{}", transactionDto);
         transactionValidationProducer.publishTransaction(transactionDto);
-//        AccountDto accountDto = AccountDto.builder()
-//                .accountNumber(ZeusRandomStringGenerator.randomString(15))
-//                .lineOfBusinessTypeCode(dataTransformationDto.getTransactionDto().getTradingPartnerDto().getLineOfBusinessTypeCode())
-//                .build();
-//        accountProducer.publishAccount(accountDto);
+        AccountProcessingRequest accountProcessingRequest = AccountProcessingRequest.builder()
+                .accountNumber(null)
+                .transactionDto(transactionDto)
+                .build();
+        accountProcessingProducer.publishAccount(accountProcessingRequest);
         return Mono.empty();
     }
 }

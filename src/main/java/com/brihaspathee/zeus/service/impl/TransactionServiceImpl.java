@@ -44,6 +44,11 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMemberService memberService;
 
     /**
+     * Trading partner helper instance
+     */
+    private final TradingPartnerHelper tradingPartnerHelper;
+
+    /**
      * Transaction detail helper instance
      */
     private final TransactionDetailHelper detailHelper;
@@ -98,6 +103,10 @@ public class TransactionServiceImpl implements TransactionService {
                 statusHelper.createStatus(
                         "RECEIVED",
                         "RECEIVED",
+                        transaction));
+        transaction.setTradingPartner(
+                tradingPartnerHelper.createTradingPartner(
+                        transactionDto.getTradingPartnerDto(),
                         transaction));
         transaction.setTransactionDetail(
                 detailHelper.createTransactionDetail(

@@ -2,11 +2,11 @@ package com.brihaspathee.zeus.broker.producer;
 
 import com.brihaspathee.zeus.constants.ZeusServiceNames;
 import com.brihaspathee.zeus.domain.entity.PayloadTracker;
-import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerHelper;
 import com.brihaspathee.zeus.message.MessageMetadata;
 import com.brihaspathee.zeus.message.ZeusMessagePayload;
 import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
+import com.brihaspathee.zeus.broker.message.AccountProcessingRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -31,20 +30,19 @@ import java.util.Arrays;
  * To change this template use File | Settings | File and Code Template
  */
 @Slf4j
-@Service
 @Component
 @RequiredArgsConstructor
-public class AccountProducer {
+public class AccountProcessingProducer {
 
     /**
      * Kafka template to produce and send messages
      */
-    private final KafkaTemplate<String, ZeusMessagePayload<AccountDto>> kafkaTemplate;
+    private final KafkaTemplate<String, ZeusMessagePayload<AccountProcessingRequest>> kafkaTemplate;
 
     /**
      * ListenableFutureCallback class that is used after success or failure of publishing the message
      */
-    private final AccountCreationCallback accountCreationCallback;
+    private final AccountProcessorCallback accountProcessorCallback;
 
     /**
      * Object mapper to convert the payload to string
@@ -58,37 +56,37 @@ public class AccountProducer {
 
     /**
      * The method that publishes the messages to the kafka topic
-     * @param accountDto
+     * @param accountProcessingRequest
      */
-    public void publishAccount(AccountDto accountDto) throws JsonProcessingException {
-        log.info("About to publish the account to member management service;{}", accountDto.getAccountNumber());
-        String[] messageDestinations = {ZeusServiceNames.MEMBER_MGMT_SERVICE};
-        ZeusMessagePayload<AccountDto> messagePayload = ZeusMessagePayload.<AccountDto>builder()
+    public void publishAccount(AccountProcessingRequest accountProcessingRequest) throws JsonProcessingException {
+        log.info("About to publish the account to account processor service;{}", accountProcessingRequest.getAccountNumber());
+        String[] messageDestinations = {ZeusServiceNames.ACCOUNT_PROCESSOR_SERVICE};
+        ZeusMessagePayload<AccountProcessingRequest> messagePayload = ZeusMessagePayload.<AccountProcessingRequest>builder()
                 .messageMetadata(MessageMetadata.builder()
                         .messageSource(ZeusServiceNames.TRANSACTION_MANAGER)
                         .messageDestination(messageDestinations)
                         .messageCreationTimestamp(LocalDateTime.now())
                         .build())
-                .payload(accountDto)
+                .payload(accountProcessingRequest)
                 .payloadId(ZeusRandomStringGenerator.randomString(15))
                 .build();
-        accountCreationCallback.setAccountDto(accountDto);
+        accountProcessorCallback.setAccountProcessingRequest(accountProcessingRequest);
         PayloadTracker payloadTracker = createPayloadTracker(messagePayload);
-        log.info("Payload tracker created to send the account {} to member management service is {}",
-                accountDto.getAccountNumber(),
+        log.info("Payload tracker created to send the account {} to account processor service is {}",
+                accountProcessingRequest.getAccountNumber(),
                 payloadTracker.getPayloadId());
-        ProducerRecord<String, ZeusMessagePayload<AccountDto>> producerRecord =
+        ProducerRecord<String, ZeusMessagePayload<AccountProcessingRequest>> producerRecord =
                 buildProducerRecord(messagePayload);
-        kafkaTemplate.send(producerRecord).addCallback(accountCreationCallback);
-        log.info("After the publishing the account {} to member management service",
-                accountDto.getAccountNumber());
+        kafkaTemplate.send(producerRecord).addCallback(accountProcessorCallback);
+        log.info("After the publishing the account {} to account processor service",
+                accountProcessingRequest.getAccountNumber());
     }
 
     /**
      * The method to build the producer record
      * @param messagePayload
      */
-    private ProducerRecord<String, ZeusMessagePayload<AccountDto>> buildProducerRecord(ZeusMessagePayload<AccountDto> messagePayload){
+    private ProducerRecord<String, ZeusMessagePayload<AccountProcessingRequest>> buildProducerRecord(ZeusMessagePayload<AccountProcessingRequest> messagePayload){
         RecordHeader messageHeader = new RecordHeader("payload-id",
                 "test payload id".getBytes());
         return new ProducerRecord<>("ZEUS.ACCOUNT.PROCESSING.REQ",
@@ -103,13 +101,13 @@ public class AccountProducer {
      * @param messagePayload
      * @throws JsonProcessingException
      */
-    private PayloadTracker createPayloadTracker(ZeusMessagePayload<AccountDto> messagePayload)
+    private PayloadTracker createPayloadTracker(ZeusMessagePayload<AccountProcessingRequest> messagePayload)
             throws JsonProcessingException {
         String payloadAsString = objectMapper.writeValueAsString(messagePayload);
         PayloadTracker payloadTracker = PayloadTracker.builder()
                 .payloadDirectionTypeCode("OUTBOUND")
-                .payload_key(messagePayload.getPayload().getAccountNumber())
-                .payload_key_type_code("ACCOUNT")
+                .payload_key(messagePayload.getPayload().getTransactionDto().getZtcn())
+                .payload_key_type_code("TRANSACTION")
                 .payload(payloadAsString)
                 .payloadId(messagePayload.getPayloadId())
                 .sourceDestinations(StringUtils.join(

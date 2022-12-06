@@ -108,8 +108,8 @@ public class TransactionValidationProducer {
         String payloadAsString = objectMapper.writeValueAsString(messagePayload);
         PayloadTracker payloadTracker = PayloadTracker.builder()
                 .payloadDirectionTypeCode("OUTBOUND")
-                .payload_key("TRANSACTION")
-                .payload_key_type_code(messagePayload.getPayload().getZtcn())
+                .payload_key(messagePayload.getPayload().getZtcn())
+                .payload_key_type_code("TRANSACTION")
                 .payload(payloadAsString)
                 .payloadId(messagePayload.getPayloadId())
                 .sourceDestinations(StringUtils.join(

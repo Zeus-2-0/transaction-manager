@@ -80,7 +80,7 @@ public class TransactionValidationProducer {
                 payloadTracker.getPayloadId());
         ProducerRecord<String, ZeusMessagePayload<TransactionDto>> producerRecord =
                 buildProducerRecord(messagePayload);
-        kafkaTemplate.send(producerRecord).addCallback(transactionValidationCallback);
+        kafkaTemplate.send(producerRecord);//.addCallback(transactionValidationCallback);
         log.info("After send the transaction {} to validation", transactionDto.getZtcn());
     }
 

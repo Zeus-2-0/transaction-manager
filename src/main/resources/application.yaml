@@ -15,9 +15,10 @@ spring:
     url: jdbc:mysql://localhost:3306/transactionmanagerdb?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: transactionmanageradmin
     password: password
-    flyway:
-      user: transactionmanageradmin
-      password: password
+  flyway:
+    user: transactionmanageradmin
+    password: password
+    clean-disabled: false
   kafka:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

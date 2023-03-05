@@ -77,7 +77,7 @@ public class AccountProcessingProducer {
                 payloadTracker.getPayloadId());
         ProducerRecord<String, ZeusMessagePayload<AccountProcessingRequest>> producerRecord =
                 buildProducerRecord(messagePayload);
-        kafkaTemplate.send(producerRecord).addCallback(accountProcessorCallback);
+        kafkaTemplate.send(producerRecord);//.addCallback(accountProcessorCallback);
         log.info("After the publishing the account {} to account processor service",
                 accountProcessingRequest.getAccountNumber());
     }

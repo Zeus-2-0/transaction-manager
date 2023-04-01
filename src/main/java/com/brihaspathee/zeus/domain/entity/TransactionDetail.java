@@ -53,6 +53,12 @@ public class TransactionDetail {
     private String transactionTypeCode;
 
     /**
+     * The type of coverage
+     */
+    @Column(name = "coverage_type_code", length = 45, columnDefinition = "varchar", nullable = false)
+    private String coverageTypeCode;
+
+    /**
      * The plan id of the transaction
      */
     @Column(name = "plan_id", length = 100, columnDefinition = "varchar", nullable = true)

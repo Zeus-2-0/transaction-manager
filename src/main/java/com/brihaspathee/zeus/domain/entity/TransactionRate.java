@@ -53,6 +53,12 @@ public class TransactionRate {
     private String rateTypeCode;
 
     /**
+     * Contains the CSR Variant that was received for the rate type code
+     */
+    @Column(name = "csr_variant", length = 10, columnDefinition = "varchar", nullable = false)
+    private String csrVariant;
+
+    /**
      * The dollar value of the rate
      */
     @Column(name = "transaction_rate", nullable = false)
@@ -92,7 +98,9 @@ public class TransactionRate {
     public String toString() {
         return "TransactionRate{" +
                 "transactionRateSK=" + transactionRateSK +
+                ", transaction=" + transaction +
                 ", rateTypeCode='" + rateTypeCode + '\'' +
+                ", csrVariant='" + csrVariant + '\'' +
                 ", transactionRate=" + transactionRate +
                 ", rateStartDate=" + rateStartDate +
                 ", rateEndDate=" + rateEndDate +

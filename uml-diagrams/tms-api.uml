@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>/Users/balaji/Documents/mac-mini/Projects.nosync/Zeus/transaction-manager/src/main/java/com/brihaspathee/zeus/web/resource</OriginalElement>
+  <nodes>
+    <node x="-59.0" y="430.0">com.brihaspathee.zeus.web.resource.interfaces.TransactionAPI</node>
+    <node x="35.5" y="114.0">com.brihaspathee.zeus.web.resource.interfaces.WelcomeAPI</node>
+    <node x="-99.0" y="230.0">com.brihaspathee.zeus.web.resource.impl.TransactionAPIImpl</node>
+    <node x="-4.5" y="-14.0">com.brihaspathee.zeus.web.resource.impl.WelcomeAPIImpl</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.brihaspathee.zeus.web.resource.impl.TransactionAPIImpl" target="com.brihaspathee.zeus.web.resource.interfaces.TransactionAPI" relationship="REALIZATION">
+      <point x="40.0" y="80.0" />
+      <point x="0.0" y="-43.5" />
+    </edge>
+    <edge source="com.brihaspathee.zeus.web.resource.impl.WelcomeAPIImpl" target="com.brihaspathee.zeus.web.resource.interfaces.WelcomeAPI" relationship="REALIZATION">
+      <point x="40.0" y="44.0" />
+      <point x="0.0" y="-31.5" />
+    </edge>
+  </edges>
+  <settings layout="Compact" zoom="1.5" showDependencies="false" x="287.0000000000001" y="261.50000000000006" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

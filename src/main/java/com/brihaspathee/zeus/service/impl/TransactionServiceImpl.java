@@ -8,6 +8,7 @@ import com.brihaspathee.zeus.mapper.interfaces.TransactionDetailMapper;
 import com.brihaspathee.zeus.mapper.interfaces.TransactionMapper;
 import com.brihaspathee.zeus.service.interfaces.TransactionMemberService;
 import com.brihaspathee.zeus.service.interfaces.TransactionService;
+import com.brihaspathee.zeus.util.TransactionManagerUtil;
 import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
 import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import lombok.RequiredArgsConstructor;
@@ -84,6 +85,11 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionStatusHelper statusHelper;
 
     /**
+     * Transaction manage utility class
+     */
+    private final TransactionManagerUtil transactionManagerUtil;
+
+    /**
      * Create the transaction
      * @param dataTransformationDto
      */
@@ -136,7 +142,9 @@ public class TransactionServiceImpl implements TransactionService {
                 memberService.createMember(
                         transactionDto.getMembers(),
                         transaction));
-        return transactionMapper.transactionToTransactionDto(transaction);
+        TransactionDto finalTransactionDto = transactionMapper.transactionToTransactionDto(transaction);
+        transactionManagerUtil.populateEntityCodes(transactionDto, finalTransactionDto);
+        return finalTransactionDto;
     }
 
     /**

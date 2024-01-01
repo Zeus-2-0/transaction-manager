@@ -33,7 +33,6 @@ public class TransactionManagerUtil {
      * Generate a unique code
      * @param source
      * @param target
-     * @return
      */
     public void populateEntityCodes(TransactionDto source, TransactionDto target) {
         // Use the code from the test data if the profile is "test"

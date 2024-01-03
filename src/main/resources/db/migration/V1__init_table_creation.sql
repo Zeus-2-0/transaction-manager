@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS `transactionmanagerdb`.`transaction` (
     `transaction_sk` VARCHAR(36) NOT NULL COMMENT 'Primary key of the table',
     `ztcn` VARCHAR(50) NOT NULL,
     `zfcn` VARCHAR(50) NULL,
+    `source` VARCHAR(50) NOT NULL COMMENT 'The source of the transaction',
     `transaction_received_date` DATETIME NOT NULL,
-    `transaction_source_type_code` VARCHAR(50) NOT NULL,
     `created_date` DATETIME NULL,
     `updated_date` DATETIME NULL,
     PRIMARY KEY (`transaction_sk`))

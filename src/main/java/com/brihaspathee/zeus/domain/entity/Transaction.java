@@ -60,8 +60,8 @@ public class Transaction {
     /**
      * The source of the transaction
      */
-    @Column(name = "transaction_source_type_code", length = 50, columnDefinition = "varchar", nullable = false)
-    private String transactionSourceTypeCode;
+    @Column(name = "source", length = 50, columnDefinition = "varchar", nullable = false)
+    private String source;
 
     /**
      * Contains the details of the transaction
@@ -142,7 +142,7 @@ public class Transaction {
                 ", ztcn='" + ztcn + '\'' +
                 ", zfcn='" + zfcn + '\'' +
                 ", transactionReceivedDate=" + transactionReceivedDate +
-                ", transactionSourceTypeCode='" + transactionSourceTypeCode + '\'' +
+                ", source='" + source + '\'' +
                 ", transactionDetail=" + transactionDetail +
                 ", tradingPartner=" + tradingPartner +
                 ", transactionRates=" + transactionRates +

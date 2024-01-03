@@ -101,7 +101,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepository.save(Transaction.builder()
                         .zfcn(transactionDto.getZfcn())
                         .ztcn(transactionDto.getZtcn())
-                        .transactionSourceTypeCode(transactionDto.getTransactionSourceTypeCode())
+                        .source(transactionDto.getSource())
                         .transactionReceivedDate(transactionDto.getTransactionReceivedDate())
                 .build());
         log.info("Transaction SK created:{}", transaction.getTransactionSK());

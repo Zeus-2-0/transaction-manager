@@ -7,6 +7,7 @@ import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 import com.brihaspathee.zeus.helper.interfaces.*;
 import com.brihaspathee.zeus.mapper.interfaces.MemberMapper;
 import com.brihaspathee.zeus.service.interfaces.TransactionMemberService;
+import com.brihaspathee.zeus.util.TransactionManagerUtil;
 import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +69,11 @@ public class TransactionMemberServiceImpl implements TransactionMemberService {
      * Member Repository instance for CRUD operations
      */
     private final MemberRepository memberRepository;
+
+    /**
+     * Transaction manage utility class
+     */
+    private final TransactionManagerUtil transactionManagerUtil;
 
     /**
      * Create Member

@@ -26,6 +26,12 @@ paths:
               $ref: '#/components/schemas/DataTransformationDto'
         required: true
       responses:
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiExceptionList'
         "400":
           description: Bad Request
           content:
@@ -38,12 +44,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataTransformationDto'
-        "409":
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiExceptionList'
   /api/v1/zeus:
     get:
       tags:
@@ -57,6 +57,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WelcomeDto'
+  /api/v1/zeus/transaction/{ztcn}:
+    get:
+      tags:
+      - transaction
+      description: Get the details of the transaction by its ZTCN
+      operationId: Get Transaction by ZTCN
+      parameters:
+      - name: ztcn
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved the details of the transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDto'
 components:
   schemas:
     DataTransformationDto:
@@ -74,7 +93,6 @@ components:
       - firstName
       - identifierTypeCode
       - lastName
-      - member
       - zipCode
       type: object
       properties:
@@ -84,8 +102,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        member:
-          $ref: '#/components/schemas/TransactionMemberDto'
+        memberSK:
+          type: string
+          format: uuid
         alternateContactTypeCode:
           type: string
           description: The type code of the alternate contact
@@ -161,7 +180,6 @@ components:
       required:
       - transactionAttributeTypeCode
       - transactionAttributeValue
-      - transactionDto
       type: object
       properties:
         transactionAttributeSK:
@@ -170,8 +188,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        transactionDto:
-          $ref: '#/components/schemas/TransactionDto'
+        transactionSK:
+          type: string
+          format: uuid
         transactionAttributeTypeCode:
           type: string
           description: The transaction attribute type code
@@ -192,7 +211,6 @@ components:
       required:
       - brokerId
       - brokerName
-      - transactionDto
       type: object
       properties:
         transactionBrokerSK:
@@ -201,8 +219,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        transactionDto:
-          $ref: '#/components/schemas/TransactionDto'
+        transactionSK:
+          type: string
+          format: uuid
         brokerName:
           type: string
           description: The name of the broker
@@ -242,13 +261,11 @@ components:
           format: date-time
     TransactionDetailDto:
       required:
+      - coverageTypeCode
       - csrVariant
       - effectiveDate
-      - endDate
       - groupPolicyId
-      - maintenanceEffectiveDate
       - planId
-      - transaction
       - transactionTypeCode
       type: object
       properties:
@@ -258,12 +275,17 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        transaction:
-          $ref: '#/components/schemas/TransactionDto'
+        transactionSK:
+          type: string
+          format: uuid
         transactionTypeCode:
           type: string
           description: The type of transaction
           example: ADD
+        coverageTypeCode:
+          type: string
+          description: The type of coverage
+          example: "true"
         planId:
           type: string
           description: The plan id received in the transaction
@@ -276,6 +298,10 @@ components:
           type: string
           description: The group policy id received in the transaction
           example: "72352456"
+        maintenanceReasonCode:
+          type: string
+          description: The maintenance reason code received in the transaction
+          example: MBS
         effectiveDate:
           type: string
           description: The effective date received in the transaction
@@ -300,10 +326,10 @@ components:
       required:
       - members
       - payer
+      - source
       - sponsor
       - tradingPartnerDto
       - transactionDetail
-      - transactionSourceTypeCode
       - ztcn
       type: object
       properties:
@@ -323,16 +349,15 @@ components:
           description: The zeus file control number
           readOnly: true
           example: DFEV323455DE5S3
+        source:
+          type: string
+          description: The source of the transaction
+          example: MARKETPLACE
         transactionReceivedDate:
           type: string
           description: The date when the transaction was received
           format: date-time
           readOnly: true
-        transactionSourceTypeCode:
-          type: string
-          description: The source of the transaction
-          readOnly: true
-          example: MARKETPLACE
         transactionDetail:
           $ref: '#/components/schemas/TransactionDetailDto'
         transactionStatus:
@@ -365,12 +390,23 @@ components:
           type: string
           description: The date when the transaction was updated
           format: date-time
+        entityCodes:
+          type: object
+          additionalProperties:
+            type: array
+            description: Map of the codes to be used for entities for an account
+            readOnly: true
+            items:
+              type: string
+              description: Map of the codes to be used for entities for an account
+              readOnly: true
+          description: Map of the codes to be used for entities for an account
+          readOnly: true
     TransactionMemberAddressDto:
       required:
       - addressLine1
       - addressTypeCode
       - city
-      - member
       - stateTypeCode
       - zipCode
       type: object
@@ -381,8 +417,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        member:
-          $ref: '#/components/schemas/TransactionMemberDto'
+        memberSK:
+          type: string
+          format: uuid
         addressTypeCode:
           type: string
           description: The type of address that was received for the member
@@ -432,7 +469,6 @@ components:
       - reasonTypeCode
       - relationshipTypeCode
       - tobaccoIndicator
-      - transaction
       - transactionMemberCode
       - transactionTypeCode
       type: object
@@ -443,12 +479,18 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        transaction:
-          $ref: '#/components/schemas/TransactionDto'
+        transactionSK:
+          type: string
+          format: uuid
         transactionMemberCode:
           type: string
           description: Unique member code assigned for the member during transaction
             processing
+          readOnly: true
+          example: DR323FS55WGS53D
+        mmsMemberCode:
+          type: string
+          description: Member code assigned to the member in MMS
           readOnly: true
           example: DR323FS55WGS53D
         transactionTypeCode:
@@ -501,6 +543,16 @@ components:
           type: number
           description: The rate received for the member in the transaction
           example: 115.35
+        height:
+          type: number
+          description: The height of the member in the transaction
+          format: double
+          example: 125
+        weight:
+          type: number
+          description: The weight of the member in the transaction
+          format: double
+          example: 135.65
         productCatalogRate:
           type: number
           description: The product catalog rate received for the member
@@ -537,10 +589,21 @@ components:
           type: string
           description: The date when the transaction was updated
           format: date-time
+        entityCodes:
+          type: object
+          additionalProperties:
+            type: array
+            description: Map of the codes to be used for entities within a member
+            readOnly: true
+            items:
+              type: string
+              description: Map of the codes to be used for entities within a member
+              readOnly: true
+          description: Map of the codes to be used for entities within a member
+          readOnly: true
     TransactionMemberEmailDto:
       required:
       - email
-      - member
       type: object
       properties:
         memberEmailSK:
@@ -549,8 +612,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        member:
-          $ref: '#/components/schemas/TransactionMemberDto'
+        memberSK:
+          type: string
+          format: uuid
         email:
           type: string
           description: The email that was received for the member
@@ -572,7 +636,6 @@ components:
       required:
       - identifierTypeCode
       - identifierValue
-      - member
       type: object
       properties:
         memberIdentifierSK:
@@ -581,8 +644,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        member:
-          $ref: '#/components/schemas/TransactionMemberDto'
+        memberSK:
+          type: string
+          format: uuid
         identifierTypeCode:
           type: string
           description: The type of identifier that was received for the member
@@ -608,7 +672,6 @@ components:
       required:
       - languageCode
       - languageTypeCode
-      - member
       type: object
       properties:
         memberLanguageSK:
@@ -617,8 +680,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        member:
-          $ref: '#/components/schemas/TransactionMemberDto'
+        memberSK:
+          type: string
+          format: uuid
         languageTypeCode:
           type: string
           description: The type of language that was received for the member
@@ -642,7 +706,6 @@ components:
           format: date-time
     TransactionMemberPhoneDto:
       required:
-      - member
       - phoneNumber
       - phoneTypeCode
       type: object
@@ -653,8 +716,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        member:
-          $ref: '#/components/schemas/TransactionMemberDto'
+        memberSK:
+          type: string
+          format: uuid
         phoneTypeCode:
           type: string
           description: The type of phone that was received for the member
@@ -680,7 +744,6 @@ components:
       required:
       - payerId
       - payerName
-      - transaction
       type: object
       properties:
         payerSK:
@@ -689,8 +752,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        transaction:
-          $ref: '#/components/schemas/TransactionDto'
+        transactionSK:
+          type: string
+          format: uuid
         payerName:
           type: string
           description: The payer name received in the transaction
@@ -714,9 +778,9 @@ components:
           format: date-time
     TransactionRateDto:
       required:
+      - csrVariant
       - rateStartDate
       - rateTypeCode
-      - transaction
       - transactionRate
       type: object
       properties:
@@ -726,8 +790,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        transaction:
-          $ref: '#/components/schemas/TransactionDto'
+        transactionSK:
+          type: string
+          format: uuid
         rateTypeCode:
           type: string
           description: The rate type
@@ -736,6 +801,10 @@ components:
           type: number
           description: The value that was received for the rate type
           example: 155.65
+        csrVariant:
+          type: string
+          description: The CSR Variant that is associated with the rate
+          example: "01"
         rateStartDate:
           type: string
           description: The start date of the rate
@@ -756,7 +825,6 @@ components:
       required:
       - sponsorId
       - sponsorName
-      - transaction
       type: object
       properties:
         sponsorSK:
@@ -765,8 +833,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        transaction:
-          $ref: '#/components/schemas/TransactionDto'
+        transactionSK:
+          type: string
+          format: uuid
         sponsorName:
           type: string
           description: The sponsor name received in the transaction
@@ -789,8 +858,6 @@ components:
           description: The date when the sponsor was updated
           format: date-time
     TransactionStatusDto:
-      required:
-      - transaction
       type: object
       properties:
         transactionStatusSK:
@@ -799,8 +866,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        transaction:
-          $ref: '#/components/schemas/TransactionDto'
+        transactionSK:
+          type: string
+          format: uuid
         statusSequence:
           type: integer
           description: Sequence of the status
@@ -832,7 +900,6 @@ components:
       - marketplaceTypeCode
       - stateTypeCode
       - tradingPartnerId
-      - transaction
       type: object
       properties:
         tradingPartnerSK:
@@ -841,8 +908,9 @@ components:
           format: uuid
           readOnly: true
           example: 657cfd75-634e-49f1-9556-4d79f79848ec
-        transaction:
-          $ref: '#/components/schemas/TransactionDto'
+        transactionSK:
+          type: string
+          format: uuid
         tradingPartnerId:
           type: string
           description: The trading partner id associated with the transaction

@@ -1,6 +1,9 @@
 zeus-transaction-manager:
   api:
     version: 1.0.0
+url:
+  host:
+    plan-catalog: http://localhost:9002/api/v1
 server:
   port: 8095
 spring:

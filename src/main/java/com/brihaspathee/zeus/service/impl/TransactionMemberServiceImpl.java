@@ -3,9 +3,11 @@ package com.brihaspathee.zeus.service.impl;
 import com.brihaspathee.zeus.domain.entity.Member;
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.domain.repository.MemberRepository;
+import com.brihaspathee.zeus.dto.rate.RateResponseDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 import com.brihaspathee.zeus.helper.interfaces.*;
 import com.brihaspathee.zeus.mapper.interfaces.MemberMapper;
+import com.brihaspathee.zeus.service.interfaces.PlanCatalogService;
 import com.brihaspathee.zeus.service.interfaces.TransactionMemberService;
 import com.brihaspathee.zeus.util.TransactionManagerUtil;
 import com.brihaspathee.zeus.util.ZeusRandomStringGenerator;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +74,11 @@ public class TransactionMemberServiceImpl implements TransactionMemberService {
     private final MemberRepository memberRepository;
 
     /**
+     * Plan Catalog Service instance to get the rates for the members in the transaction
+     */
+    private final PlanCatalogService planCatalogService;
+
+    /**
      * Transaction manage utility class
      */
     private final TransactionManagerUtil transactionManagerUtil;
@@ -83,7 +91,10 @@ public class TransactionMemberServiceImpl implements TransactionMemberService {
     public List<Member> createMember(List<TransactionMemberDto> memberDtos,
                              Transaction transaction) {
         List<Member> members = new ArrayList<>();
-        memberDtos.stream().forEach(memberDto -> {
+        getMemberRates(memberDtos,
+                transaction.getTransactionDetail().getPlanId(),
+                transaction.getTransactionDetail().getEffectiveDate());
+        memberDtos.forEach(memberDto -> {
             Member member = memberMapper.memberDtoMember(memberDto);
             member.setTransaction(transaction);
             member.setTransactionMemberCode(ZeusRandomStringGenerator.randomString(15));
@@ -115,5 +126,17 @@ public class TransactionMemberServiceImpl implements TransactionMemberService {
             members.add(member);
         });
         return members;
+    }
+
+    /**
+     * Get member rates
+     * @param transactionMemberDtos
+     * @param planId
+     * @param effectiveDate
+     */
+    private void getMemberRates(List<TransactionMemberDto> transactionMemberDtos,
+                                String planId,
+                                LocalDate effectiveDate){
+        planCatalogService.getMemberRates(transactionMemberDtos, planId, effectiveDate);
     }
 }

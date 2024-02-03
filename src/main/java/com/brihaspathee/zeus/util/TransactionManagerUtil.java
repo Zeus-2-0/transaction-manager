@@ -57,7 +57,7 @@ public class TransactionManagerUtil {
      * @param transactionMemberDto
      * @return
      */
-    private String getExchangeMemberId(TransactionMemberDto transactionMemberDto){
+    public String getExchangeMemberId(TransactionMemberDto transactionMemberDto){
         return transactionMemberDto.getIdentifiers()
                 .stream()
                 .filter(

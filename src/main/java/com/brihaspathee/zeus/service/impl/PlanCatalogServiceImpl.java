@@ -7,6 +7,7 @@ import com.brihaspathee.zeus.dto.rate.RateResponseDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberAddressDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 import com.brihaspathee.zeus.service.interfaces.PlanCatalogService;
+import com.brihaspathee.zeus.util.TransactionManagerUtil;
 import com.brihaspathee.zeus.web.response.ZeusApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,11 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
     private final RestTemplate restTemplate;
 
     /**
+     * Transaction Manager Util instance
+     */
+    private final TransactionManagerUtil transactionManagerUtil;
+
+    /**
      * Web client instance to get the member rates from plan catalog
      */
     private final WebClient webClient;
@@ -81,7 +87,7 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
                 .stateTypeCode(residentialAddress.getStateTypeCode())
                 .memberRateRequestDtos(memberRateRequestDtos)
                 .build();
-        RateResponseDto rateResponseDto = useWebClient(planCatalogServiceHost, rateRequestDto);
+        RateResponseDto rateResponseDto = useWebClient(planCatalogServiceHost+"/zeus/plan-catalog/member-rate", rateRequestDto);
         populateMemberRates(transactionMemberDtos, rateResponseDto);
     }
 
@@ -91,19 +97,14 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
      * @param rateRequestDto
      */
     private RateResponseDto useWebClient(String host, RateRequestDto rateRequestDto){
-        AtomicReference<RateResponseDto> rateResponseDto = new AtomicReference<>();
-        Mono<ZeusApiResponse<RateResponseDto>> apiResponseMono = webClient.post()
+        log.info("Rate Request Dto:{}", rateRequestDto);
+        ZeusApiResponse<RateResponseDto> apiResponse = webClient.post()
                 .uri(host)
                 .body(Mono.just(rateRequestDto), RateRequestDto.class)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<ZeusApiResponse<RateResponseDto>>() {});
-        apiResponseMono.doOnError(exception -> {
-            log.info("Some Exception occurred:{}", exception.getMessage());
-        }).subscribe(response -> {
-            log.info("Web Client API Response:{}", response.getResponse().getMemberRateResponseDtos());
-            rateResponseDto.set(response.getResponse());
-        });
-        return rateResponseDto.get();
+                .bodyToMono(new ParameterizedTypeReference<ZeusApiResponse<RateResponseDto>>() {}).block();
+        assert apiResponse != null;
+        return apiResponse.getResponse();
     }
 
     /**
@@ -134,7 +135,7 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
                                                             LocalDate effectiveDate){
         return MemberRateRequestDto.builder()
                 .age(calculateAge(transactionMemberDto.getDateOfBirth(), effectiveDate))
-                .memberRateCode(transactionMemberDto.getTransactionMemberCode())
+                .memberRateCode(transactionManagerUtil.getExchangeMemberId(transactionMemberDto))
                 .genderTypeCode(transactionMemberDto.getGenderTypeCode())
                 .relationshipTypeCode(transactionMemberDto.getRelationshipTypeCode())
                 .firstName(transactionMemberDto.getFirstName())
@@ -181,6 +182,7 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
      */
     private void populateMemberRates(List<TransactionMemberDto> transactionMemberDtos,
                                                 RateResponseDto rateResponseDto){
+        log.info("Rate response DTO:{}",rateResponseDto);
         if(rateResponseDto == null ||
                 rateResponseDto.isException() ||
                 rateResponseDto.getMemberRateResponseDtos().isEmpty()){
@@ -189,9 +191,10 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
         List<MemberRateResponseDto> memberRateResponseDtos = rateResponseDto.getMemberRateResponseDtos();
         if(memberRateResponseDtos != null && !memberRateResponseDtos.isEmpty()){
             transactionMemberDtos.forEach(transactionMemberDto -> {
+                String exchangeMemberId = transactionManagerUtil.getExchangeMemberId(transactionMemberDto);
                 Optional<MemberRateResponseDto> optionalMemberRate = memberRateResponseDtos.stream()
                         .filter(memberRateResponseDto -> memberRateResponseDto.getMemberRateCode()
-                                .equals(transactionMemberDto.getTransactionMemberCode())).findFirst();
+                                .equals(exchangeMemberId)).findFirst();
                 if(optionalMemberRate.isPresent()){
                     MemberRateResponseDto memberRateResponseDto = optionalMemberRate.get();
                     BigDecimal memberRate = memberRateResponseDto.getMemberRate();

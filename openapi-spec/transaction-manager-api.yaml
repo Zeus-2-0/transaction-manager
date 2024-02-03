@@ -26,24 +26,24 @@ paths:
               $ref: '#/components/schemas/DataTransformationDto'
         required: true
       responses:
-        "409":
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiExceptionList'
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiExceptionList'
         "201":
           description: Successfully created the transaction
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataTransformationDto'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiExceptionList'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiExceptionList'
   /api/v1/zeus:
     get:
       tags:

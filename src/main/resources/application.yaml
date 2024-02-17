@@ -4,6 +4,7 @@ zeus-transaction-manager:
 url:
   host:
     plan-catalog: http://localhost:9002/api/v1
+    mms: http://localhost:8084/api/v1
 server:
   port: 8095
 spring:

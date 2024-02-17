@@ -3,6 +3,8 @@ package com.brihaspathee.zeus.helper.impl;
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.domain.entity.TransactionStatus;
 import com.brihaspathee.zeus.domain.repository.TransactionStatusRepository;
+import com.brihaspathee.zeus.dto.transaction.TransactionDto;
+import com.brihaspathee.zeus.dto.transaction.TransactionStatusDto;
 import com.brihaspathee.zeus.helper.interfaces.TransactionStatusHelper;
 import com.brihaspathee.zeus.mapper.interfaces.TransactionStatusMapper;
 import lombok.RequiredArgsConstructor;
@@ -75,5 +77,15 @@ public class TransactionStatusHelperImpl implements TransactionStatusHelper {
             statuses.add(statusRepository.save(newStatus));
         }
         return statuses;
+    }
+
+    /**
+     * Update the status of the transaction
+     * @param transactionStatusDto
+     */
+    @Override
+    public void updateTransactionStatus(TransactionStatusDto transactionStatusDto) {
+        TransactionStatus status = statusMapper.statusDtoToStatus(transactionStatusDto);
+        statusRepository.save(status);
     }
 }

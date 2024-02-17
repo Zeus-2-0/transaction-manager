@@ -2,7 +2,10 @@ package com.brihaspathee.zeus.service.impl;
 
 import com.brihaspathee.zeus.broker.producer.AccountProcessingProducer;
 import com.brihaspathee.zeus.broker.producer.TransactionValidationProducer;
+import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
+import com.brihaspathee.zeus.helper.interfaces.TransactionStatusHelper;
+import com.brihaspathee.zeus.service.interfaces.AccountMatchService;
 import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
 import com.brihaspathee.zeus.service.interfaces.TransactionService;
 import com.brihaspathee.zeus.broker.message.AccountProcessingRequest;
@@ -43,6 +46,16 @@ public class TransactionProcessorImpl implements TransactionProcessor {
     private final TransactionService transactionService;
 
     /**
+     * Account match service instance
+     */
+    private final AccountMatchService accountMatchService;
+
+    /**
+     * Transaction status helper instance
+     */
+    private final TransactionStatusHelper transactionStatusHelper;
+
+    /**
      * Process transaction
      * @param dataTransformationDto
      */
@@ -51,9 +64,16 @@ public class TransactionProcessorImpl implements TransactionProcessor {
         log.info("Transaction received for processing:{}", dataTransformationDto);
         TransactionDto transactionDto = transactionService.createTransaction(dataTransformationDto);
         log.info("Transaction after inserting to tables:{}", transactionDto);
+        transactionStatusHelper.createStatus("PROCESSING",
+                "PROCESSING",
+                Transaction.builder()
+                        .transactionSK(transactionDto.getTransactionSK())
+                        .build());
         transactionValidationProducer.publishTransaction(transactionDto);
+        String accountNumber = accountMatchService.matchAccount(transactionDto);
+        log.info("Matched Account Number:{}", accountNumber);
         AccountProcessingRequest accountProcessingRequest = AccountProcessingRequest.builder()
-                .accountNumber(null)
+                .accountNumber(accountNumber)
                 .transactionDto(transactionDto)
                 .build();
         accountProcessingProducer.publishAccount(accountProcessingRequest);

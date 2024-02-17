@@ -1,15 +1,15 @@
 package com.brihaspathee.zeus.util;
 
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
+import com.brihaspathee.zeus.dto.transaction.TransactionMemberAddressDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
+import com.brihaspathee.zeus.dto.transaction.TransactionMemberIdentifierDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created in Intellij IDEA
@@ -41,9 +41,9 @@ public class TransactionManagerUtil {
             target.setEntityCodes(source.getEntityCodes());
             source.getMembers().forEach(sourceMember -> {
                 if(sourceMember.getEntityCodes()!=null && !sourceMember.getEntityCodes().isEmpty()){
-                    String sourceExchangeMemberId = getExchangeMemberId(sourceMember);
+                    String sourceExchangeMemberId = getMemberId(sourceMember, "EXCHMEMID").getIdentifierValue();
                     TransactionMemberDto targetMember = target.getMembers().stream().filter(targetMem -> {
-                        String targetExchangeMemberId = getExchangeMemberId(targetMem);
+                        String targetExchangeMemberId = getMemberId(targetMem, "EXCHMEMID").getIdentifierValue();
                         return targetExchangeMemberId.equals(sourceExchangeMemberId);
                     }).findFirst().orElseThrow();
                     targetMember.setEntityCodes(sourceMember.getEntityCodes());
@@ -55,17 +55,47 @@ public class TransactionManagerUtil {
     /**
      * Get the exchange member id of the member
      * @param transactionMemberDto
+     * @param identifierType
      * @return
      */
-    public String getExchangeMemberId(TransactionMemberDto transactionMemberDto){
+    public TransactionMemberIdentifierDto getMemberId(TransactionMemberDto transactionMemberDto, String identifierType){
         return transactionMemberDto.getIdentifiers()
                 .stream()
                 .filter(
                         transactionMemberIdentifierDto ->
-                                transactionMemberIdentifierDto.getIdentifierTypeCode().equals("EXCHMEMID"))
+                                transactionMemberIdentifierDto.getIdentifierTypeCode().equals(identifierType))
                 .findFirst()
-                .orElseThrow()
-                .getIdentifierValue();
+                .orElse(null);
+
+    }
+
+    /**
+     * Get the primary subscriber if present in the transaction
+     * @return
+     */
+    public TransactionMemberDto getPrimarySubscriber(TransactionDto transactionDto){
+        return transactionDto.getMembers()
+                .stream()
+                .filter(transactionMemberDto ->
+                        transactionMemberDto.getRelationshipTypeCode().equals("HOH"))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Get a specific address type from the member
+     * @param transactionMemberDto
+     * @param addressType
+     * @return
+     */
+    public TransactionMemberAddressDto getAddress(TransactionMemberDto transactionMemberDto, String addressType){
+        return transactionMemberDto.getMemberAddresses()
+                .stream()
+                .filter(
+                        transactionMemberAddressDto ->
+                                transactionMemberAddressDto.getAddressTypeCode().equals(addressType))
+                .findFirst()
+                .orElse(null);
     }
 
 }

@@ -2,6 +2,7 @@ package com.brihaspathee.zeus.helper.interfaces;
 
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.domain.entity.TransactionStatus;
+import com.brihaspathee.zeus.dto.transaction.TransactionStatusDto;
 
 import java.util.List;
 
@@ -25,4 +26,10 @@ public interface TransactionStatusHelper {
     List<TransactionStatus> createStatus(String transactionStatus,
                       String transactionProcessingStatus,
                       Transaction transaction);
+
+    /**
+     * Update the status of the transaction
+     * @param transactionStatusDto
+     */
+    void updateTransactionStatus(TransactionStatusDto transactionStatusDto);
 }

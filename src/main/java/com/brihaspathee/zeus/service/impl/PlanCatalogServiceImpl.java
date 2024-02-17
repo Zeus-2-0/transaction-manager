@@ -6,6 +6,8 @@ import com.brihaspathee.zeus.dto.rate.RateRequestDto;
 import com.brihaspathee.zeus.dto.rate.RateResponseDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberAddressDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
+import com.brihaspathee.zeus.dto.transaction.TransactionMemberIdentifierDto;
+import com.brihaspathee.zeus.exception.ExchangeMemberIdNotFoundException;
 import com.brihaspathee.zeus.service.interfaces.PlanCatalogService;
 import com.brihaspathee.zeus.util.TransactionManagerUtil;
 import com.brihaspathee.zeus.web.response.ZeusApiResponse;
@@ -26,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created in Intellij IDEA
@@ -133,15 +134,22 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
      */
     private MemberRateRequestDto constructMemberRateRequest(TransactionMemberDto transactionMemberDto,
                                                             LocalDate effectiveDate){
-        return MemberRateRequestDto.builder()
+        MemberRateRequestDto memberRateRequestDto =  MemberRateRequestDto.builder()
                 .age(calculateAge(transactionMemberDto.getDateOfBirth(), effectiveDate))
-                .memberRateCode(transactionManagerUtil.getExchangeMemberId(transactionMemberDto))
                 .genderTypeCode(transactionMemberDto.getGenderTypeCode())
                 .relationshipTypeCode(transactionMemberDto.getRelationshipTypeCode())
                 .firstName(transactionMemberDto.getFirstName())
                 .lastName(transactionMemberDto.getLastName())
                 .tobaccoInd(transactionMemberDto.getTobaccoIndicator().equals("U"))
                 .build();
+        TransactionMemberIdentifierDto transactionMemberIdentifierDto =
+                transactionManagerUtil.getMemberId(transactionMemberDto, "EXCHMEMID");
+        if(transactionMemberIdentifierDto == null){
+            throw new ExchangeMemberIdNotFoundException("Exchange Member Id not found for member: "+
+                    transactionMemberDto.getTransactionMemberCode());
+        }
+        memberRateRequestDto.setMemberRateCode(transactionMemberIdentifierDto.getIdentifierValue());
+        return memberRateRequestDto;
     }
 
     /**
@@ -191,10 +199,15 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
         List<MemberRateResponseDto> memberRateResponseDtos = rateResponseDto.getMemberRateResponseDtos();
         if(memberRateResponseDtos != null && !memberRateResponseDtos.isEmpty()){
             transactionMemberDtos.forEach(transactionMemberDto -> {
-                String exchangeMemberId = transactionManagerUtil.getExchangeMemberId(transactionMemberDto);
+                TransactionMemberIdentifierDto transactionMemberIdentifierDto =
+                        transactionManagerUtil.getMemberId(transactionMemberDto, "EXCHMEMID");
+                if(transactionMemberIdentifierDto == null){
+                    throw new ExchangeMemberIdNotFoundException("Exchange Member Id not found for member: "+
+                            transactionMemberDto.getTransactionMemberCode());
+                }
                 Optional<MemberRateResponseDto> optionalMemberRate = memberRateResponseDtos.stream()
                         .filter(memberRateResponseDto -> memberRateResponseDto.getMemberRateCode()
-                                .equals(exchangeMemberId)).findFirst();
+                                .equals(transactionMemberIdentifierDto.getIdentifierValue())).findFirst();
                 if(optionalMemberRate.isPresent()){
                     MemberRateResponseDto memberRateResponseDto = optionalMemberRate.get();
                     BigDecimal memberRate = memberRateResponseDto.getMemberRate();

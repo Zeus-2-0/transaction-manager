@@ -27,4 +27,15 @@ public interface TransactionService {
      * @return
      */
     TransactionDto getTransactionByZtcn(String ztcn);
+
+    /**
+     * Delete all data related to the transaction
+     * @param ztcn
+     */
+    void cleanUp(String ztcn);
+
+    /**
+     * Delete all data from the service
+     */
+    void deleteAll();
 }

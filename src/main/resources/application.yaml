@@ -13,8 +13,8 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
+        show_sql: false
+        format_sql: false
   datasource:
     url: jdbc:mysql://localhost:3306/transactionmanagerdb?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: transactionmanageradmin

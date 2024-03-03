@@ -2,6 +2,7 @@ package com.brihaspathee.zeus.service.interfaces;
 
 import com.brihaspathee.zeus.domain.entity.Member;
 import com.brihaspathee.zeus.domain.entity.Transaction;
+import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 
 import java.util.List;
@@ -24,4 +25,10 @@ public interface TransactionMemberService {
      */
     List<Member> createMember(List<TransactionMemberDto> memberDtos,
                               Transaction transaction);
+
+    /**
+     * Populate product catalog rate and member rate if not available
+     * @param transactionDto
+     */
+    void populateMemberRates(TransactionDto transactionDto);
 }

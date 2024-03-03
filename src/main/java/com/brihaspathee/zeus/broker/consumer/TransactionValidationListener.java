@@ -1,10 +1,13 @@
 package com.brihaspathee.zeus.broker.consumer;
 
 import com.brihaspathee.zeus.domain.entity.PayloadTrackerDetail;
+import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerDetailHelper;
 import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerHelper;
 import com.brihaspathee.zeus.message.Acknowledgement;
 import com.brihaspathee.zeus.message.ZeusMessagePayload;
+import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
+import com.brihaspathee.zeus.service.interfaces.TransactionService;
 import com.brihaspathee.zeus.validator.AccountValidationResult;
 import com.brihaspathee.zeus.validator.TransactionValidationResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -46,6 +49,11 @@ public class TransactionValidationListener {
     private final PayloadTrackerDetailHelper payloadTrackerDetailHelper;
 
     /**
+     * Transaction processor instance
+     */
+    private final TransactionProcessor transactionProcessor;
+
+    /**
      * kafka consumer to consume the acknowledgement messages
      * @param consumerRecord
      * @throws JsonProcessingException
@@ -74,14 +82,16 @@ public class TransactionValidationListener {
     public void listenForValidationResponse(
             ConsumerRecord<String, ZeusMessagePayload<TransactionValidationResult>> consumerRecord
     ) throws JsonProcessingException {
-        log.info("Validation Response received");
+        log.info("Validation Response received 1");
         String valueAsString = objectMapper.writeValueAsString(consumerRecord.value());
+        log.info("Value received as response:{}", valueAsString);
         ZeusMessagePayload<TransactionValidationResult> transactionValidationResultPayload =
                 objectMapper.readValue(valueAsString,
                         new TypeReference<ZeusMessagePayload<TransactionValidationResult>>() {});
-
-        createPayloadTrackerRespDetail(transactionValidationResultPayload);
         log.info("Validation Response:{}", transactionValidationResultPayload.getPayload());
+        createPayloadTrackerRespDetail(transactionValidationResultPayload);
+        // Continue to process the transaction post receiving the results from rules validation
+        transactionProcessor.processValidationRuleResults(transactionValidationResultPayload.getPayload());
 
     }
 
@@ -109,7 +119,9 @@ public class TransactionValidationListener {
      */
     private void createPayloadTrackerRespDetail(
             ZeusMessagePayload<TransactionValidationResult> payload) throws JsonProcessingException {
+        log.info("Payload tracker detail to be created for response");
         String payloadAsString = objectMapper.writeValueAsString(payload);
+        log.info("Payload string:{}", payloadAsString);
         PayloadTrackerDetail payloadTrackerDetail = PayloadTrackerDetail.builder()
                 .payloadTracker(payloadTrackerHelper.getPayloadTracker(payload.getPayload().getRequestPayloadId()))
                 .responsePayload(payloadAsString)
@@ -119,5 +131,6 @@ public class TransactionValidationListener {
                 .sourceDestinations(payload.getMessageMetadata().getMessageSource())
                 .build();
         payloadTrackerDetailHelper.createPayloadTrackerDetail(payloadTrackerDetail);
+        log.info("Payload tracker detail created for response");
     }
 }

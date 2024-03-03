@@ -73,7 +73,7 @@ public class AccountProcessingListener {
     public void listenForAccountProcessingResponse(
             ConsumerRecord<String, ZeusMessagePayload<AccountProcessingResponse>> consumerRecord
     ) throws JsonProcessingException {
-        log.info("Validation Response received");
+        log.info("APS Response received");
         String valueAsString = objectMapper.writeValueAsString(consumerRecord.value());
         ZeusMessagePayload<AccountProcessingResponse> accountValidationResultPayload =
                 objectMapper.readValue(valueAsString,

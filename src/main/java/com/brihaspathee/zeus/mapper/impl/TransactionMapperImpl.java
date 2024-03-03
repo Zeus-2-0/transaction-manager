@@ -68,6 +68,11 @@ public class TransactionMapperImpl implements TransactionMapper {
     private final TransactionStatusMapper statusMapper;
 
     /**
+     * Transaction rule mapper instance
+     */
+    private final TransactionRuleMapper ruleMapper;
+
+    /**
      * Member mapper instance
      */
     private final MemberMapper memberMapper;
@@ -117,6 +122,10 @@ public class TransactionMapperImpl implements TransactionMapper {
                                     Comparator.comparing(TransactionStatus::getStatusSeq))
                             .get();
             transactionDto.setTransactionStatus(statusMapper.statusToStatusDto(transactionStatus));
+        }
+        // Check if there are any rules executed for the transaction
+        if(transaction.getTransactionRules() !=null && transaction.getTransactionRules().size() > 0){
+            transactionDto.setTransactionRules(ruleMapper.rulesToRuleDtos(transaction.getTransactionRules()));
         }
         return transactionDto;
     }

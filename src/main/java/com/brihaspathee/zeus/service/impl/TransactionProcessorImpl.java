@@ -2,19 +2,26 @@ package com.brihaspathee.zeus.service.impl;
 
 import com.brihaspathee.zeus.broker.producer.AccountProcessingProducer;
 import com.brihaspathee.zeus.broker.producer.TransactionValidationProducer;
+import com.brihaspathee.zeus.constants.TransactionProcessingStatusValue;
+import com.brihaspathee.zeus.constants.TransactionStatusValue;
+import com.brihaspathee.zeus.constants.TransactionTypes;
 import com.brihaspathee.zeus.domain.entity.Transaction;
+import com.brihaspathee.zeus.domain.entity.TransactionStatus;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
+import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 import com.brihaspathee.zeus.helper.interfaces.TransactionStatusHelper;
-import com.brihaspathee.zeus.service.interfaces.AccountMatchService;
-import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
-import com.brihaspathee.zeus.service.interfaces.TransactionService;
+import com.brihaspathee.zeus.service.interfaces.*;
 import com.brihaspathee.zeus.broker.message.AccountProcessingRequest;
+import com.brihaspathee.zeus.validator.TransactionValidationResult;
 import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.util.Arrays;
 
 /**
  * Created in Intellij IDEA
@@ -46,6 +53,11 @@ public class TransactionProcessorImpl implements TransactionProcessor {
     private final TransactionService transactionService;
 
     /**
+     * Transaction member service instance
+     */
+    private final TransactionMemberService transactionMemberService;
+
+    /**
      * Account match service instance
      */
     private final AccountMatchService accountMatchService;
@@ -56,6 +68,16 @@ public class TransactionProcessorImpl implements TransactionProcessor {
     private final TransactionStatusHelper transactionStatusHelper;
 
     /**
+     * Rule management service instance
+     */
+    private final RuleManagementService ruleManagementService;
+
+    /**
+     * The environment in which the service is running
+     */
+    private final Environment environment;
+
+    /**
      * Process transaction
      * @param dataTransformationDto
      */
@@ -64,12 +86,74 @@ public class TransactionProcessorImpl implements TransactionProcessor {
         log.info("Transaction received for processing:{}", dataTransformationDto);
         TransactionDto transactionDto = transactionService.createTransaction(dataTransformationDto);
         log.info("Transaction after inserting to tables:{}", transactionDto);
-        transactionStatusHelper.createStatus("PROCESSING",
-                "PROCESSING",
+        transactionStatusHelper.createStatus(TransactionStatusValue.PROCESSING.toString(),
+                TransactionProcessingStatusValue.PROCESSING.toString(),
                 Transaction.builder()
                         .transactionSK(transactionDto.getTransactionSK())
                         .build());
         transactionValidationProducer.publishTransaction(transactionDto);
+//        String accountNumber = accountMatchService.matchAccount(transactionDto);
+//        log.info("Matched Account Number:{}", accountNumber);
+//        AccountProcessingRequest accountProcessingRequest = AccountProcessingRequest.builder()
+//                .accountNumber(accountNumber)
+//                .transactionDto(transactionDto)
+//                .build();
+//        accountProcessingProducer.publishAccount(accountProcessingRequest);
+        return Mono.empty();
+    }
+
+    /**
+     * Process transaction rule validation results
+     * @param transactionValidationResult
+     */
+    @Override
+    public void processValidationRuleResults(TransactionValidationResult transactionValidationResult) throws JsonProcessingException {
+        log.info("Rules validations are received, starting to process the results");
+        String ztcn = transactionValidationResult.getZtcn();
+        TransactionDto transactionDto = transactionService.getTransactionByZtcn(ztcn);
+        log.info("Transaction for which the results are received:{}",transactionDto);
+        boolean validationsPassed = ruleManagementService.saveTransactionRules(transactionDto, transactionValidationResult);
+        if(validationsPassed){
+            // if all the transaction related validations have passed
+            // if the transaction is CHANGE or ADD
+            if(transactionDto.getTransactionDetail().getTransactionTypeCode().equals(TransactionTypes.ADD.toString()) ||
+            transactionDto.getTransactionDetail().getTransactionTypeCode().equals(TransactionTypes.CHANGE.toString())){
+                // Populate the member rates if not present
+                populateRates(transactionDto);
+            }
+            // Populate the entity code if the service is running in a test environment
+            populateTestEntityCodes(transactionDto,
+                    transactionValidationResult.getTestTransactionDto());
+            // Send transaction to APS
+            sendTransactionToAPS(transactionDto);
+            transactionStatusHelper.createStatus(TransactionStatusValue.PROCESSING.toString(),
+                    TransactionProcessingStatusValue.SENT_TO_APS.toString(),
+                    Transaction.builder()
+                            .transactionSK(transactionDto.getTransactionSK())
+                            .build());
+        }else{
+            transactionStatusHelper.createStatus(TransactionStatusValue.EXCEPTION.toString(),
+                    TransactionProcessingStatusValue.EXCEPTION.toString(),
+                    Transaction.builder()
+                            .transactionSK(transactionDto.getTransactionSK())
+                            .build());
+        }
+    }
+
+    /**
+     * Populate the rates for members
+     * @param transactionDto
+     */
+    private void populateRates(TransactionDto transactionDto){
+        transactionMemberService.populateMemberRates(transactionDto);
+    }
+
+    /**
+     * Send the transaction to APS for futher processing
+     * @param transactionDto
+     * @throws JsonProcessingException
+     */
+    private void sendTransactionToAPS(TransactionDto transactionDto) throws JsonProcessingException {
         String accountNumber = accountMatchService.matchAccount(transactionDto);
         log.info("Matched Account Number:{}", accountNumber);
         AccountProcessingRequest accountProcessingRequest = AccountProcessingRequest.builder()
@@ -77,6 +161,33 @@ public class TransactionProcessorImpl implements TransactionProcessor {
                 .transactionDto(transactionDto)
                 .build();
         accountProcessingProducer.publishAccount(accountProcessingRequest);
-        return Mono.empty();
+    }
+
+    /**
+     * Populate the entity codes if the service is running in an
+     * integration test environment
+     * @param finalTransaction
+     * @param originalTransaction
+     */
+    private void populateTestEntityCodes(TransactionDto finalTransaction,
+                                         TransactionDto originalTransaction){
+        if(Arrays.asList(environment.getActiveProfiles()).contains("int-test")){
+            if(originalTransaction.getEntityCodes() != null && !originalTransaction.getEntityCodes().isEmpty()){
+                finalTransaction.setEntityCodes(originalTransaction.getEntityCodes());
+            }
+            originalTransaction.getMembers().forEach(transactionMemberDto -> {
+                if(transactionMemberDto.getEntityCodes() !=null && !transactionMemberDto.getEntityCodes().isEmpty()){
+                    // Find the member in the final transaction dto
+                    TransactionMemberDto memberDto = finalTransaction.getMembers()
+                            .stream()
+                            .filter(member -> member.getTransactionMemberCode()
+                                    .equals(transactionMemberDto.getTransactionMemberCode()))
+                            .findFirst()
+                            .orElseThrow();
+                    memberDto.setEntityCodes(transactionMemberDto.getEntityCodes());
+                }
+
+            });
+        }
     }
 }

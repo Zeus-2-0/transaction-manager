@@ -1,6 +1,7 @@
 package com.brihaspathee.zeus.service.interfaces;
 
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
+import com.brihaspathee.zeus.validator.TransactionValidationResult;
 import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import reactor.core.publisher.Mono;
@@ -23,4 +24,10 @@ public interface TransactionProcessor {
      * @throws JsonProcessingException
      */
     Mono<Void> processTransaction(DataTransformationDto dataTransformationDto) throws JsonProcessingException;
+
+    /**
+     * Process the transaction validation results
+     * @param transactionValidationResult
+     */
+    void processValidationRuleResults(TransactionValidationResult transactionValidationResult) throws JsonProcessingException;
 }

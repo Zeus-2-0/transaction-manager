@@ -87,4 +87,32 @@ public interface TransactionAPI {
     )
     @GetMapping("/{ztcn}")
     ResponseEntity<ZeusApiResponse<TransactionDto>> getTransactionByZtcn(@PathVariable("ztcn") String ztcn);
+
+    /**
+     * Delete transaction by ZTCN
+     * @param ztcn
+     * @return
+     */
+    @DeleteMapping("/delete/{ztcn}")
+    ResponseEntity<ZeusApiResponse<String>> cleanUp(@PathVariable("ztcn") String ztcn);
+
+    /**
+     * Clean up the entire db
+     * @return
+     */
+    @Operation(
+            operationId = "Delete all data",
+            method = "DELETE",
+            description = "Delete all data",
+            tags = {"account"}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204",
+                    description = "Data deleted successfully",
+                    content = {
+                            @Content(mediaType = "application/json",schema = @Schema(implementation = ZeusApiResponse.class))
+                    })
+    })
+    @DeleteMapping("/delete")
+    ResponseEntity<ZeusApiResponse<String>> cleanUp();
 }

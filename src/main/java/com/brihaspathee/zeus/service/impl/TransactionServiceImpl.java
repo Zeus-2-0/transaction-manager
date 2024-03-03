@@ -14,6 +14,8 @@ import com.brihaspathee.zeus.web.model.DataTransformationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created in Intellij IDEA
@@ -85,6 +87,11 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionStatusHelper statusHelper;
 
     /**
+     * Payload tracker helper instance
+     */
+    private final PayloadTrackerHelper payloadTrackerHelper;
+
+    /**
      * Transaction manage utility class
      */
     private final TransactionManagerUtil transactionManagerUtil;
@@ -152,9 +159,31 @@ public class TransactionServiceImpl implements TransactionService {
      * @param ztcn
      * @return
      */
+    @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     @Override
     public TransactionDto getTransactionByZtcn(String ztcn) {
+        Transaction transaction = transactionRepository.findByZtcn(ztcn).get();
         return transactionMapper.transactionToTransactionDto(
-                transactionRepository.findByZtcn(ztcn).get());
+                transaction);
+    }
+
+    /**
+     * Delete all data related to the transaction
+     * @param ztcn
+     */
+    @Override
+    public void cleanUp(String ztcn) {
+        log.info("Ztcn to be deleted:{}", ztcn);
+        Transaction transaction = transactionRepository.findByZtcn(ztcn).orElseThrow();
+        transactionRepository.delete(transaction);
+    }
+
+    /**
+     * Clean up all the transaction and payload tracker data from the service
+     */
+    @Override
+    public void deleteAll() {
+        transactionRepository.deleteAll();
+        payloadTrackerHelper.deleteAll();
     }
 }

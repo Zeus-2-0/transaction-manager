@@ -73,4 +73,41 @@ public class TransactionAPIImpl implements TransactionAPI {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
+
+    /**
+     * Delete the transaction with the ZTCN provided
+     * @param ztcn
+     * @return
+     */
+    @Override
+    public ResponseEntity<ZeusApiResponse<String>> cleanUp(String ztcn) {
+        transactionService.cleanUp(ztcn);
+        ZeusApiResponse<String> apiResponse = ZeusApiResponse.<String>builder()
+                .response("Delete Successful")
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatus.OK.value())
+                .message(ApiResponseConstants.SUCCESS)
+                .developerMessage(ApiResponseConstants.SUCCESS_REASON)
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    /**
+     * Delete the entire DB
+     * @return
+     */
+    @Override
+    public ResponseEntity<ZeusApiResponse<String>> cleanUp() {
+        transactionService.deleteAll();
+        ZeusApiResponse<String> apiResponse = ZeusApiResponse.<String>builder()
+                .response("All data from transaction manager deleted successfully")
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatus.OK.value())
+                .message(ApiResponseConstants.SUCCESS)
+                .developerMessage(ApiResponseConstants.SUCCESS_REASON)
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
 }

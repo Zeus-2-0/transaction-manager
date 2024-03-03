@@ -4,6 +4,7 @@ import com.brihaspathee.zeus.domain.entity.Member;
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.domain.repository.MemberRepository;
 import com.brihaspathee.zeus.dto.rate.RateResponseDto;
+import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 import com.brihaspathee.zeus.helper.interfaces.*;
 import com.brihaspathee.zeus.mapper.interfaces.MemberMapper;
@@ -91,9 +92,9 @@ public class TransactionMemberServiceImpl implements TransactionMemberService {
     public List<Member> createMember(List<TransactionMemberDto> memberDtos,
                              Transaction transaction) {
         List<Member> members = new ArrayList<>();
-        getMemberRates(memberDtos,
-                transaction.getTransactionDetail().getPlanId(),
-                transaction.getTransactionDetail().getEffectiveDate());
+//        getMemberRates(memberDtos,
+//                transaction.getTransactionDetail().getPlanId(),
+//                transaction.getTransactionDetail().getEffectiveDate());
         memberDtos.forEach(memberDto -> {
             Member member = memberMapper.memberDtoMember(memberDto);
             member.setTransaction(transaction);
@@ -138,5 +139,26 @@ public class TransactionMemberServiceImpl implements TransactionMemberService {
                                 String planId,
                                 LocalDate effectiveDate){
         planCatalogService.getMemberRates(transactionMemberDtos, planId, effectiveDate);
+    }
+
+    /**
+     * Populate the product catalog and member rates
+     * @param transactionDto
+     */
+    public void populateMemberRates(TransactionDto transactionDto){
+        List<TransactionMemberDto> memberDtos = transactionDto.getMembers();
+        getMemberRates(memberDtos,
+                transactionDto.getTransactionDetail().getPlanId(),
+                transactionDto.getTransactionDetail().getEffectiveDate());
+        memberDtos.forEach(memberDto -> {
+            log.info("Member Code:{}", memberDto.getTransactionMemberCode());
+            log.info("Member Rate:{}", memberDto.getMemberRate());
+            log.info("Product Catalog rate:{}", memberDto.getProductCatalogRate());
+            Member member = memberMapper.memberDtoMember(memberDto);
+            member.setTransaction(Transaction.builder()
+                    .transactionSK(transactionDto.getTransactionSK())
+                    .build());
+            memberRepository.save(member);
+        });
     }
 }

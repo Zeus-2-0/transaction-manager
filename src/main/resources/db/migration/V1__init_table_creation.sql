@@ -16,6 +16,8 @@ DROP TABLE IF EXISTS `transactionmanagerdb`.`member_identifier`;
 DROP TABLE IF EXISTS `transactionmanagerdb`.`member_email`;
 DROP TABLE IF EXISTS `transactionmanagerdb`.`member_language`;
 DROP TABLE IF EXISTS `transactionmanagerdb`.`alternate_contact`;
+DROP TABLE IF EXISTS `transactionmanagerdb`.`transaction_rule`;
+DROP TABLE IF EXISTS `transactionmanagerdb`.`transaction_rule_message`;
 CREATE TABLE IF NOT EXISTS `transactionmanagerdb`.`payload_tracker` (
     `payload_tracker_sk` VARCHAR(36) NOT NULL,
     `payload_id` VARCHAR(45) NOT NULL COMMENT 'A unique id assigned for the payload',
@@ -353,3 +355,37 @@ CREATE TABLE IF NOT EXISTS `transactionmanagerdb`.`alternate_contact` (
     ON UPDATE NO ACTION)
     ENGINE = InnoDB
     COMMENT = 'The alternate contacts received for the member in the transaction';
+CREATE TABLE transactionmanagerdb.transaction_rule (
+                                                       transaction_rule_sk varchar(36) NOT NULL COMMENT 'Primary key of the table',
+                                                       transaction_sk varchar(36) NOT NULL COMMENT 'Transaction for which the rule was executed',
+                                                       transaction_member_code varchar(15) NULL COMMENT 'If the rule is a member level rule, the member for which the rule was executed',
+                                                       exchange_member_id varchar(50) NULL COMMENT 'If the rule is a member level rule, the member for which the rule was executed',
+                                                       rule_id varchar(50) NOT NULL COMMENT 'Id of the rule',
+                                                       rule_name varchar(100) NOT NULL COMMENT 'Name of the rule',
+                                                       rule_passed BIT NOT NULL COMMENT 'Indicates if the rule passed or failed',
+                                                       created_date DATETIME NULL COMMENT 'Date when the record was created',
+                                                       updated_date DATETIME NULL COMMENT 'Date when the record was updated',
+                                                       CONSTRAINT transaction_rule_pk PRIMARY KEY (transaction_rule_sk),
+                                                       CONSTRAINT transaction_rule_transaction_FK FOREIGN KEY (transaction_sk) REFERENCES transactionmanagerdb.`transaction`(transaction_sk)
+)
+    ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci
+COMMENT='This table contains all the rules that were executed for the transaction.';
+CREATE TABLE transactionmanagerdb.transaction_rule_message (
+                                                               transaction_rule_message_sk varchar(36) NOT NULL COMMENT 'Primary key of the table',
+                                                               transaction_rule_sk varchar(36) NOT NULL COMMENT 'The rule from which the message was created',
+                                                               message_code varchar(100) NOT NULL COMMENT 'The code of the message',
+                                                               message_type_code varchar(100) NOT NULL COMMENT 'The type code of message, identifying if the message is CRITICAL, ERROR, WARNING OR INFO',
+                                                               message_desc varchar(100) NOT NULL COMMENT 'The description of the message',
+                                                               created_date DATETIME NULL COMMENT 'The date when the record was created.',
+                                                               updated_date DATETIME NULL COMMENT 'The date when the record was updated',
+                                                               CONSTRAINT transaction_rule_message_pk PRIMARY KEY (transaction_rule_message_sk),
+                                                               CONSTRAINT transaction_rule_message_transaction_rule_FK FOREIGN KEY (transaction_rule_sk) REFERENCES transactionmanagerdb.transaction_rule(transaction_rule_sk)
+)
+    ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci
+COMMENT='All the messages created by the rules while processing the transaction';
+
+

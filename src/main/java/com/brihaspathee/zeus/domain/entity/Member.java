@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.domain.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.*;
@@ -134,37 +135,37 @@ public class Member {
     /**
      * The list of the emails received for the member in the transaction
      */
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<MemberEmail> memberEmails;
 
     /**
      * The list of the emails received for the member in the transaction
      */
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<MemberPhone> memberPhones;
 
     /**
      * The list of the identifiers received for the member in the transaction
      */
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<MemberIdentifier> memberIdentifiers;
 
     /**
      * The list of the languages received for the member in the transaction
      */
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<MemberLanguage> memberLanguages;
 
     /**
      * The list of the addresses received for the member in the transaction
      */
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<MemberAddress> memberAddresses;
 
     /**
      * The list of the alternate contacts received for the member in the transaction
      */
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<AlternateContact> alternateContacts;
 
     /**

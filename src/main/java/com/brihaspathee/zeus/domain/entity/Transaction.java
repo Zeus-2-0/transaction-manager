@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.domain.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.*;
@@ -66,56 +67,62 @@ public class Transaction {
     /**
      * Contains the details of the transaction
      */
-    @OneToOne(mappedBy = "transaction", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "transaction", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private TransactionDetail transactionDetail;
 
     /**
      * Contains the details of the trading partner
      */
-    @OneToOne(mappedBy = "transaction")
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.REMOVE)
     private TradingPartner tradingPartner;
 
     /**
      * The list of rates received for the transaction
      */
-    @OneToMany(mappedBy = "transaction")
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.REMOVE)
     private List<TransactionRate> transactionRates;
 
     /**
      * The list of rates received for the transaction
      */
-    @OneToMany(mappedBy = "transaction")
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.REMOVE)
     private List<TransactionAttributes> transactionAttributes;
 
     /**
      * Contains the payer of the transaction
      */
-    @OneToOne(mappedBy = "transaction")
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.REMOVE)
     private Payer payer;
 
     /**
      * Contains the sponsor of the transaction
      */
-    @OneToOne(mappedBy = "transaction")
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.REMOVE)
     private Sponsor sponsor;
 
     /**
      * Contains the broker of the transaction
      */
-    @OneToOne(mappedBy = "transaction")
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.REMOVE)
     private Broker broker;
 
     /**
      * Contains the broker of the transaction
      */
-    @OneToMany(mappedBy = "transaction")
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.REMOVE)
     private List<TransactionStatus> transactionStatus;
 
     /**
      * Contains the members of the transaction
      */
-    @OneToMany(mappedBy = "transaction", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.REMOVE)
     private List<Member> members;
+
+    /**
+     * Contains the rules associated with the transaction
+     */
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.REMOVE)
+    private List<TransactionRule> transactionRules;
 
     /**
      * The date when the record was created

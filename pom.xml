@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.brihaspathee.zeus</groupId>
     <artifactId>transaction-manager</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>Transaction Manager</name>
     <description>Zeus Enrollment Transaction Manager</description>
     <properties>
@@ -30,7 +30,7 @@
         <!--        <developerConnection>scm:git:ssh://github.com:Zeus-2-0/transaction-manager.git</developerConnection>-->
         <developerConnection>scm:git:git@github.com:Zeus-2-0/transaction-manager.git</developerConnection>
         <url>scm:git:http://github.com/Zeus-2-0/transaction-manager</url>
-        <tag>transaction-manager-1.0.0</tag>
+        <tag>transaction-manager-0.0.2</tag>
     </scm>
 
     <developers>

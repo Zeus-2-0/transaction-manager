@@ -52,6 +52,13 @@ public class TransactionDetail {
     @Column(name = "transaction_type_code", length = 45, columnDefinition = "varchar", nullable = false)
     private String transactionTypeCode;
 
+
+    /**
+     * The maintenance reason code received in the transaction
+     */
+    @Column(name = "maintenance_reason_code", length = 45, columnDefinition = "varchar", nullable = true)
+    private String maintenanceReasonCode;
+
     /**
      * The type of coverage
      */

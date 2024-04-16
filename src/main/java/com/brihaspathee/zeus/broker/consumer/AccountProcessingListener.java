@@ -1,11 +1,15 @@
 package com.brihaspathee.zeus.broker.consumer;
 
 import com.brihaspathee.zeus.broker.message.AccountProcessingResponse;
+import com.brihaspathee.zeus.constants.TransactionProcessingStatusValue;
+import com.brihaspathee.zeus.constants.TransactionStatusValue;
 import com.brihaspathee.zeus.domain.entity.PayloadTrackerDetail;
+import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerDetailHelper;
 import com.brihaspathee.zeus.helper.interfaces.PayloadTrackerHelper;
 import com.brihaspathee.zeus.message.Acknowledgement;
 import com.brihaspathee.zeus.message.ZeusMessagePayload;
+import com.brihaspathee.zeus.service.interfaces.TransactionProcessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +49,11 @@ public class AccountProcessingListener {
     private final PayloadTrackerDetailHelper payloadTrackerDetailHelper;
 
     /**
+     * Transaction processor instance
+     */
+    private final TransactionProcessor transactionProcessor;
+
+    /**
      * kafka consumer to consume the acknowledgement messages from member management service
      * @param consumerRecord
      * @throws JsonProcessingException
@@ -75,10 +84,13 @@ public class AccountProcessingListener {
     ) throws JsonProcessingException {
         log.info("APS Response received");
         String valueAsString = objectMapper.writeValueAsString(consumerRecord.value());
-        ZeusMessagePayload<AccountProcessingResponse> accountValidationResultPayload =
+        ZeusMessagePayload<AccountProcessingResponse> accountProcessingResultPayload =
                 objectMapper.readValue(valueAsString,
                         new TypeReference<ZeusMessagePayload<AccountProcessingResponse>>() {});
-        createPayloadTrackerRespDetail(accountValidationResultPayload);
+        createPayloadTrackerRespDetail(accountProcessingResultPayload);
+        // Continue to process the transaction post receiving the results from rules validation
+        transactionProcessor.processAPSResponse(accountProcessingResultPayload.getPayload());
+
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.service.impl;
 
+import com.brihaspathee.zeus.broker.message.AccountProcessingResponse;
 import com.brihaspathee.zeus.broker.producer.AccountProcessingProducer;
 import com.brihaspathee.zeus.broker.producer.TransactionValidationProducer;
 import com.brihaspathee.zeus.constants.TransactionProcessingStatusValue;
@@ -134,6 +135,27 @@ public class TransactionProcessorImpl implements TransactionProcessor {
         }else{
             transactionStatusHelper.createStatus(TransactionStatusValue.EXCEPTION.toString(),
                     TransactionProcessingStatusValue.EXCEPTION.toString(),
+                    Transaction.builder()
+                            .transactionSK(transactionDto.getTransactionSK())
+                            .build());
+        }
+    }
+
+    @Override
+    public void processAPSResponse(AccountProcessingResponse accountProcessingResponse) {
+        String ztcn = accountProcessingResponse.getZtcn();
+        TransactionDto transactionDto = transactionService.getTransactionByZtcn(ztcn);
+        String apsResponseCode = accountProcessingResponse.getResponseCode();
+        log.info("APS Response Code Received:{}", apsResponseCode);
+        if(apsResponseCode.equals("8000002")){
+            transactionStatusHelper.createStatus(TransactionStatusValue.PROCESSING.toString(),
+                    TransactionProcessingStatusValue.SENT_TO_MMS.toString(),
+                    Transaction.builder()
+                            .transactionSK(transactionDto.getTransactionSK())
+                            .build());
+        } else if(apsResponseCode.equals("8000003")){
+            transactionStatusHelper.createStatus(TransactionStatusValue.PROCESSED.toString(),
+                    TransactionProcessingStatusValue.PROCESSED.toString(),
                     Transaction.builder()
                             .transactionSK(transactionDto.getTransactionSK())
                             .build());

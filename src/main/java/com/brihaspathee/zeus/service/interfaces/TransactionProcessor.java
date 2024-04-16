@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.service.interfaces;
 
+import com.brihaspathee.zeus.broker.message.AccountProcessingResponse;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.validator.TransactionValidationResult;
 import com.brihaspathee.zeus.web.model.DataTransformationDto;
@@ -30,4 +31,10 @@ public interface TransactionProcessor {
      * @param transactionValidationResult
      */
     void processValidationRuleResults(TransactionValidationResult transactionValidationResult) throws JsonProcessingException;
+
+    /**
+     * Process the response received from APS
+     * @param accountProcessingResponse
+     */
+    void processAPSResponse(AccountProcessingResponse accountProcessingResponse);
 }

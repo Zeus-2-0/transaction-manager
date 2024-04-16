@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.service.impl;
 
+import com.brihaspathee.zeus.constants.TobaccoUse;
 import com.brihaspathee.zeus.dto.rate.MemberRateRequestDto;
 import com.brihaspathee.zeus.dto.rate.MemberRateResponseDto;
 import com.brihaspathee.zeus.dto.rate.RateRequestDto;
@@ -140,7 +141,7 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
                 .relationshipTypeCode(transactionMemberDto.getRelationshipTypeCode())
                 .firstName(transactionMemberDto.getFirstName())
                 .lastName(transactionMemberDto.getLastName())
-                .tobaccoInd(transactionMemberDto.getTobaccoIndicator().equals("U"))
+                .tobaccoInd(isTobaccoUser(transactionMemberDto.getTobaccoIndicator()))
                 .build();
         TransactionMemberIdentifierDto transactionMemberIdentifierDto =
                 transactionManagerUtil.getMemberId(transactionMemberDto, "EXCHMEMID");
@@ -231,5 +232,20 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
         long daysBetween = ChronoUnit.DAYS.between(dateOfBirth, effectiveDate);
         long age = daysBetween / 365;
         return (int) age;
+    }
+
+    /**
+     * Check if the tobacco indicator indicates if the user as consumes tobacco
+     * @param tobaccoInd
+     * @return
+     */
+    private boolean isTobaccoUser(String tobaccoInd){
+        if(tobaccoInd.equals(TobaccoUse.SUBABS.toString()) ||
+                tobaccoInd.equals(TobaccoUse.TOBANDSUB.toString()) ||
+                tobaccoInd.equals(TobaccoUse.TOBUSE.toString())){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS `transactionmanagerdb`.`transaction_detail` (
     `transaction_detail_sk` VARCHAR(36) NOT NULL COMMENT 'Primary key of the table',
     `transaction_sk` VARCHAR(36) NOT NULL COMMENT 'Transaction that is associated with the detail',
     `transaction_type_code` VARCHAR(45) NOT NULL COMMENT 'Transaction type of the transaction',
+    `maintenance_reason_code` VARCHAR(45) NULL COMMENT 'Transaction type of the transaction',
     `coverage_type_code` VARCHAR(50) NOT NULL COMMENT 'Identifies the type of coverage received for the transaction',
     `plan_id` VARCHAR(100) NULL COMMENT 'The plan id received in the transaction',
     `csr_variant` VARCHAR(10) NULL COMMENT 'The car variant received in the transaction',

@@ -32,14 +32,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataTransformationDto'
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiExceptionList'
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             application/json:
               schema:

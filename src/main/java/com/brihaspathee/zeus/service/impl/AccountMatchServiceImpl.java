@@ -59,7 +59,7 @@ public class AccountMatchServiceImpl implements AccountMatchService {
      * @return
      */
     @Override
-    public String matchAccount(TransactionDto transactionDto) {
+    public AccountDto matchAccount(TransactionDto transactionDto) {
         TransactionMemberDto memberDto = transactionManagerUtil.getPrimarySubscriber(transactionDto);
         // check if the primary subscriber is present
         if(memberDto == null){
@@ -90,7 +90,7 @@ public class AccountMatchServiceImpl implements AccountMatchService {
         AccountList accountList = useWebClient(mmsHost, accountMatchParam);
         if(accountList != null && accountList.getAccountDtos() != null && !accountList.getAccountDtos().isEmpty()){
             Optional<AccountDto> optionalAccount = accountList.getAccountDtos().stream().findFirst();
-            return optionalAccount.map(AccountDto::getAccountNumber).orElse(null);
+            return optionalAccount.orElse(null);
         }
         return null;
     }

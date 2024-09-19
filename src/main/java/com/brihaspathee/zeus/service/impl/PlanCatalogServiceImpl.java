@@ -1,6 +1,9 @@
 package com.brihaspathee.zeus.service.impl;
 
 import com.brihaspathee.zeus.constants.TobaccoUse;
+import com.brihaspathee.zeus.dto.account.AccountDto;
+import com.brihaspathee.zeus.dto.account.MemberAddressDto;
+import com.brihaspathee.zeus.dto.account.MemberDto;
 import com.brihaspathee.zeus.dto.rate.MemberRateRequestDto;
 import com.brihaspathee.zeus.dto.rate.MemberRateResponseDto;
 import com.brihaspathee.zeus.dto.rate.RateRequestDto;
@@ -23,12 +26,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created in Intellij IDEA
@@ -64,16 +69,17 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
 
     /**
      * Get rates for the members in the transaction
-     * @param transactionMemberDtos
-     * @param planId
-     * @param effectiveDate
+     * @param matchedAccount - the account that was matched for the transaction
+     * @param transactionMemberDtos - the member's in the transaction
+     * @param planId - the plan id received in the transaction
+     * @param effectiveDate - the effective date of the transaction
      */
     @Override
-    public void getMemberRates(List<TransactionMemberDto> transactionMemberDtos,
-                                          String planId,
+    public void getMemberRates(AccountDto matchedAccount, List<TransactionMemberDto> transactionMemberDtos,
+                               String planId,
                                LocalDate effectiveDate) {
         TransactionMemberDto primarySubscriber = getPrimarySubscriber(transactionMemberDtos);
-        TransactionMemberAddressDto residentialAddress = getResidentialAddress(primarySubscriber);
+        TransactionMemberAddressDto residentialAddress = getResidentialAddress(matchedAccount, primarySubscriber);
         if(primarySubscriber == null || residentialAddress == null){
             return;
         }
@@ -166,22 +172,86 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
     }
 
     /**
-     * Get member's primary residential address
-     * @param transactionMemberDto
-     * @return
+     * Get member's primary residential address from the transaction or the account
+     * @param matchAccount - the account that was matched
+     * @param transactionMemberDto - the member in the transaction
+     * @return the residential address of the member
      */
-    private TransactionMemberAddressDto getResidentialAddress(TransactionMemberDto transactionMemberDto){
+    private TransactionMemberAddressDto getResidentialAddress(AccountDto matchAccount, TransactionMemberDto transactionMemberDto){
         if(transactionMemberDto != null){
-            return transactionMemberDto.getMemberAddresses()
-                    .stream()
-                    .filter(transactionMemberAddressDto ->
-                            transactionMemberAddressDto.getAddressTypeCode()
-                                    .equals("RESIDENCE"))
-                    .findFirst()
-                    .orElse(null);
+            if(transactionMemberDto.getMemberAddresses() != null){
+                return transactionMemberDto.getMemberAddresses()
+                        .stream()
+                        .filter(transactionMemberAddressDto ->
+                                transactionMemberAddressDto.getAddressTypeCode()
+                                        .equals("RESIDENCE"))
+                        .findFirst()
+                        .orElse(null);
+            }else{
+                // get the residential address from the account
+                MemberAddressDto memberAddressDto = getResidentialAddress(matchAccount,
+                        transactionMemberDto.getEffectiveDate());
+                return TransactionMemberAddressDto.builder()
+                        .countyCode(memberAddressDto.getFipsCode())
+                        .zipCode(memberAddressDto.getZipCode())
+                        .stateTypeCode(memberAddressDto.getStateTypeCode())
+                        .build();
+            }
+
         }else{
             return null;
         }
+    }
+
+    /**
+     * Get residential address from the account
+     * @param accountDto
+     * @param effectiveDate
+     * @return
+     */
+    private MemberAddressDto getResidentialAddress(AccountDto accountDto, LocalDate effectiveDate){
+        if(accountDto != null && accountDto.getMembers()!=null){
+            log.info("About to get the address from the account:{}", accountDto.getAccountNumber());
+            Optional<MemberDto> optionalMemberDto = accountDto.getMembers()
+                    .stream()
+                    .filter(
+                            memberDto ->
+                                    memberDto.getRelationshipTypeCode()
+                                            .equals("HOH")).findFirst();
+            if(optionalMemberDto.isPresent()){
+                MemberDto memberDto = optionalMemberDto.get();
+                log.info("Primary subscriber present in the account:{}", memberDto.getMemberCode());
+                if(memberDto.getMemberAddresses() != null && !memberDto.getMemberAddresses().isEmpty()){
+                    List<MemberAddressDto> residentialAddresses = memberDto.getMemberAddresses().stream().filter(memberAddressDto ->
+                        memberAddressDto.getAddressTypeCode().equals("RESIDENCE")).toList();
+                    if (!residentialAddresses.isEmpty()){
+                        log.info("Residential addresses present in the account:{}", residentialAddresses.size());
+                        Optional<MemberAddressDto> optionalMemberAddressDto = residentialAddresses.stream().filter(memberAddressDto -> {
+                            LocalDate addressStartDate = memberAddressDto.getStartDate();
+                            LocalDate addressEndDate = memberAddressDto.getEndDate();
+                            if(addressEndDate != null){
+                                if(addressStartDate.isEqual(addressEndDate)){
+                                    return false;
+                                }else if((effectiveDate.isEqual(addressStartDate))){
+                                    return true;
+                                }else return effectiveDate.isAfter(addressStartDate) &&
+                                        (effectiveDate.isEqual(addressEndDate) ||
+                                                effectiveDate.isBefore(addressEndDate));
+                            }else{
+                                return (effectiveDate.isEqual(addressStartDate)) ||
+                                        (effectiveDate.isAfter(addressStartDate));
+                            }
+                        }).findFirst();
+                        log.info("Is residential address present:{}", optionalMemberAddressDto.isPresent());
+                        if(optionalMemberAddressDto.isPresent()){
+                            return optionalMemberAddressDto.get();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+
     }
 
     /**
@@ -229,7 +299,10 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
      * @return
      */
     private int calculateAge(LocalDate dateOfBirth, LocalDate effectiveDate){
-        long daysBetween = ChronoUnit.DAYS.between(dateOfBirth, effectiveDate);
+        Temporal temporalDOB = dateOfBirth.atStartOfDay();
+        Temporal temporalEffectiveDate = effectiveDate.atStartOfDay();
+        Duration duration = Duration.between(temporalDOB, temporalEffectiveDate);
+        long daysBetween = Math.abs(duration.toDays());
         long age = daysBetween / 365;
         return (int) age;
     }

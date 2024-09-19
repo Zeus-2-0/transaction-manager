@@ -3,6 +3,7 @@ package com.brihaspathee.zeus.service.impl;
 import com.brihaspathee.zeus.domain.entity.Member;
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.domain.repository.MemberRepository;
+import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.dto.rate.RateResponseDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
@@ -131,23 +132,25 @@ public class TransactionMemberServiceImpl implements TransactionMemberService {
 
     /**
      * Get member rates
-     * @param transactionMemberDtos
-     * @param planId
-     * @param effectiveDate
+     * @param matchedAccount - the account that was matched for the transaction
+     * @param transactionMemberDtos - the members in the transaction
+     * @param planId - the plan id of the transaction
+     * @param effectiveDate - the effective date of the transaction
      */
-    private void getMemberRates(List<TransactionMemberDto> transactionMemberDtos,
+    private void getMemberRates(AccountDto matchedAccount, List<TransactionMemberDto> transactionMemberDtos,
                                 String planId,
                                 LocalDate effectiveDate){
-        planCatalogService.getMemberRates(transactionMemberDtos, planId, effectiveDate);
+        planCatalogService.getMemberRates(matchedAccount, transactionMemberDtos, planId, effectiveDate);
     }
 
     /**
      * Populate the product catalog and member rates
-     * @param transactionDto
+     * @param matchedAccount - the account that was matched
+     * @param transactionDto - the transaction dto
      */
-    public void populateMemberRates(TransactionDto transactionDto){
+    public void populateMemberRates(AccountDto matchedAccount, TransactionDto transactionDto){
         List<TransactionMemberDto> memberDtos = transactionDto.getMembers();
-        getMemberRates(memberDtos,
+        getMemberRates(matchedAccount, memberDtos,
                 transactionDto.getTransactionDetail().getPlanId(),
                 transactionDto.getTransactionDetail().getEffectiveDate());
         memberDtos.forEach(memberDto -> {

@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.service.interfaces;
 
+import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 
 /**
@@ -18,5 +19,5 @@ public interface AccountMatchService {
      * @param transactionDto
      * @return
      */
-    String matchAccount(TransactionDto transactionDto);
+    AccountDto matchAccount(TransactionDto transactionDto);
 }

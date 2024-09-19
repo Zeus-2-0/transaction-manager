@@ -8,6 +8,7 @@ import com.brihaspathee.zeus.constants.TransactionStatusValue;
 import com.brihaspathee.zeus.constants.TransactionTypes;
 import com.brihaspathee.zeus.domain.entity.Transaction;
 import com.brihaspathee.zeus.domain.entity.TransactionStatus;
+import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 import com.brihaspathee.zeus.helper.interfaces.TransactionStatusHelper;
@@ -115,18 +116,23 @@ public class TransactionProcessorImpl implements TransactionProcessor {
         log.info("Transaction for which the results are received:{}",transactionDto);
         boolean validationsPassed = ruleManagementService.saveTransactionRules(transactionDto, transactionValidationResult);
         if(validationsPassed){
+            AccountDto matchedAccount = accountMatchService.matchAccount(transactionDto);
             // if all the transaction related validations have passed
             // if the transaction is CHANGE or ADD
             if(transactionDto.getTransactionDetail().getTransactionTypeCode().equals(TransactionTypes.ADD.toString()) ||
             transactionDto.getTransactionDetail().getTransactionTypeCode().equals(TransactionTypes.CHANGE.toString())){
                 // Populate the member rates if not present
-                populateRates(transactionDto);
+                populateRates(matchedAccount, transactionDto);
             }
             // Populate the entity code if the service is running in a test environment
             populateTestEntityCodes(transactionDto,
                     transactionValidationResult.getTestTransactionDto());
             // Send transaction to APS
-            sendTransactionToAPS(transactionDto);
+            if(matchedAccount!=null){
+                sendTransactionToAPS(matchedAccount.getAccountNumber(), transactionDto);
+            }else{
+                sendTransactionToAPS(null, transactionDto);
+            }
             transactionStatusHelper.createStatus(TransactionStatusValue.PROCESSING.toString(),
                     TransactionProcessingStatusValue.SENT_TO_APS.toString(),
                     Transaction.builder()
@@ -147,13 +153,25 @@ public class TransactionProcessorImpl implements TransactionProcessor {
         TransactionDto transactionDto = transactionService.getTransactionByZtcn(ztcn);
         String apsResponseCode = accountProcessingResponse.getResponseCode();
         log.info("APS Response Code Received:{}", apsResponseCode);
-        if(apsResponseCode.equals("8000002")){
+        if(apsResponseCode.equals("8000001")){
+            transactionStatusHelper.createStatus(TransactionStatusValue.PROCESSING.toString(),
+                    TransactionProcessingStatusValue.SENT_FOR_VALIDATION.toString(),
+                    Transaction.builder()
+                            .transactionSK(transactionDto.getTransactionSK())
+                            .build());
+        }else if(apsResponseCode.equals("8000002")){
             transactionStatusHelper.createStatus(TransactionStatusValue.PROCESSING.toString(),
                     TransactionProcessingStatusValue.SENT_TO_MMS.toString(),
                     Transaction.builder()
                             .transactionSK(transactionDto.getTransactionSK())
                             .build());
         } else if(apsResponseCode.equals("8000003")){
+            transactionStatusHelper.createStatus(TransactionStatusValue.PROCESSED.toString(),
+                    TransactionProcessingStatusValue.SENT_TO_PB.toString(),
+                    Transaction.builder()
+                            .transactionSK(transactionDto.getTransactionSK())
+                            .build());
+        }else if(apsResponseCode.equals("8000004")){
             transactionStatusHelper.createStatus(TransactionStatusValue.PROCESSED.toString(),
                     TransactionProcessingStatusValue.PROCESSED.toString(),
                     Transaction.builder()
@@ -164,19 +182,20 @@ public class TransactionProcessorImpl implements TransactionProcessor {
 
     /**
      * Populate the rates for members
-     * @param transactionDto
+     * @param matchedAccount - the account that was matched for the transaction
+     * @param transactionDto - the transaction dto
      */
-    private void populateRates(TransactionDto transactionDto){
-        transactionMemberService.populateMemberRates(transactionDto);
+    private void populateRates(AccountDto matchedAccount, TransactionDto transactionDto){
+        transactionMemberService.populateMemberRates(matchedAccount, transactionDto);
     }
 
     /**
-     * Send the transaction to APS for futher processing
+     * Send the transaction to APS for further processing
+     * @param accountNumber - the account number if present that was matched with the transaction
      * @param transactionDto
      * @throws JsonProcessingException
      */
-    private void sendTransactionToAPS(TransactionDto transactionDto) throws JsonProcessingException {
-        String accountNumber = accountMatchService.matchAccount(transactionDto);
+    private void sendTransactionToAPS(String accountNumber, TransactionDto transactionDto) throws JsonProcessingException {
         log.info("Matched Account Number:{}", accountNumber);
         AccountProcessingRequest accountProcessingRequest = AccountProcessingRequest.builder()
                 .accountNumber(accountNumber)

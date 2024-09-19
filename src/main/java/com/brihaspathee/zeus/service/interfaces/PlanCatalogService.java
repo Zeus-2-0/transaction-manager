@@ -1,5 +1,6 @@
 package com.brihaspathee.zeus.service.interfaces;
 
+import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.dto.rate.RateResponseDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 
@@ -19,11 +20,12 @@ public interface PlanCatalogService {
 
     /**
      * Get Rates for all the members in the transaction
+     * @param matchedAccount - the account that was matched for the transaction
      * @param transactionMemberDtos
      * @param planId
      * @param effectiveDate
      */
-    void getMemberRates(List<TransactionMemberDto> transactionMemberDtos,
+    void getMemberRates(AccountDto matchedAccount, List<TransactionMemberDto> transactionMemberDtos,
                         String planId,
                         LocalDate effectiveDate);
 }

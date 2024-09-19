@@ -2,6 +2,7 @@ package com.brihaspathee.zeus.service.interfaces;
 
 import com.brihaspathee.zeus.domain.entity.Member;
 import com.brihaspathee.zeus.domain.entity.Transaction;
+import com.brihaspathee.zeus.dto.account.AccountDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionDto;
 import com.brihaspathee.zeus.dto.transaction.TransactionMemberDto;
 
@@ -28,7 +29,8 @@ public interface TransactionMemberService {
 
     /**
      * Populate product catalog rate and member rate if not available
-     * @param transactionDto
+     * @param accountDto - the account that was matched for the transaction
+     * @param transactionDto - the transaction dto
      */
-    void populateMemberRates(TransactionDto transactionDto);
+    void populateMemberRates(AccountDto accountDto, TransactionDto transactionDto);
 }

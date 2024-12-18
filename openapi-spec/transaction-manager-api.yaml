@@ -23,27 +23,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DataTransformationDto'
+              $ref: "#/components/schemas/DataTransformationDto"
         required: true
       responses:
-        "201":
-          description: Successfully created the transaction
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DataTransformationDto'
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiExceptionList'
+                $ref: "#/components/schemas/ApiExceptionList"
         "409":
           description: Conflict
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiExceptionList'
+                $ref: "#/components/schemas/ApiExceptionList"
+        "201":
+          description: Successfully created the transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTransformationDto"
   /api/v1/zeus:
     get:
       tags:
@@ -56,7 +56,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WelcomeDto'
+                $ref: "#/components/schemas/WelcomeDto"
   /api/v1/zeus/transaction/{ztcn}:
     get:
       tags:
@@ -75,7 +75,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionDto'
+                $ref: "#/components/schemas/TransactionDto"
   /api/v1/zeus/transaction/delete:
     delete:
       tags:
@@ -88,7 +88,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ZeusApiResponse'
+                $ref: "#/components/schemas/ZeusApiResponse"
   /api/v1/zeus/transaction/delete/{ztcn}:
     delete:
       tags:
@@ -106,18 +106,18 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ZeusApiResponseString'
+                $ref: "#/components/schemas/ZeusApiResponseString"
 components:
   schemas:
     DataTransformationDto:
       type: object
       properties:
         transactionDto:
-          $ref: '#/components/schemas/TransactionDto'
+          $ref: "#/components/schemas/TransactionDto"
         transformationMessages:
           type: array
           items:
-            $ref: '#/components/schemas/TransformationMessage'
+            $ref: "#/components/schemas/TransformationMessage"
     TransactionAlternateContactDto:
       required:
       - alternateContactTypeCode
@@ -390,33 +390,33 @@ components:
           format: date-time
           readOnly: true
         transactionDetail:
-          $ref: '#/components/schemas/TransactionDetailDto'
+          $ref: "#/components/schemas/TransactionDetailDto"
         transactionStatus:
-          $ref: '#/components/schemas/TransactionStatusDto'
+          $ref: "#/components/schemas/TransactionStatusDto"
         transactionAttributes:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionAttributeDto'
+            $ref: "#/components/schemas/TransactionAttributeDto"
         transactionRates:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionRateDto'
+            $ref: "#/components/schemas/TransactionRateDto"
         tradingPartnerDto:
-          $ref: '#/components/schemas/TransactionTradingPartnerDto'
+          $ref: "#/components/schemas/TransactionTradingPartnerDto"
         sponsor:
-          $ref: '#/components/schemas/TransactionSponsorDto'
+          $ref: "#/components/schemas/TransactionSponsorDto"
         broker:
-          $ref: '#/components/schemas/TransactionBrokerDto'
+          $ref: "#/components/schemas/TransactionBrokerDto"
         payer:
-          $ref: '#/components/schemas/TransactionPayerDto'
+          $ref: "#/components/schemas/TransactionPayerDto"
         members:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionMemberDto'
+            $ref: "#/components/schemas/TransactionMemberDto"
         transactionRules:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionRuleDto'
+            $ref: "#/components/schemas/TransactionRuleDto"
         createdDate:
           type: string
           description: The date when the transaction was created
@@ -595,27 +595,27 @@ components:
         memberPhones:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionMemberPhoneDto'
+            $ref: "#/components/schemas/TransactionMemberPhoneDto"
         memberAddresses:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionMemberAddressDto'
+            $ref: "#/components/schemas/TransactionMemberAddressDto"
         identifiers:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionMemberIdentifierDto'
+            $ref: "#/components/schemas/TransactionMemberIdentifierDto"
         emails:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionMemberEmailDto'
+            $ref: "#/components/schemas/TransactionMemberEmailDto"
         languages:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionMemberLanguageDto'
+            $ref: "#/components/schemas/TransactionMemberLanguageDto"
         alternateContacts:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionAlternateContactDto'
+            $ref: "#/components/schemas/TransactionAlternateContactDto"
         createdDate:
           type: string
           description: The date when the transaction was created
@@ -893,7 +893,7 @@ components:
           type: array
           description: The list of message created by the rule
           items:
-            $ref: '#/components/schemas/TransactionRuleMessageDto'
+            $ref: "#/components/schemas/TransactionRuleMessageDto"
     TransactionRuleMessageDto:
       required:
       - messageCode
@@ -1065,7 +1065,7 @@ components:
         exceptions:
           type: array
           items:
-            $ref: '#/components/schemas/ApiException'
+            $ref: "#/components/schemas/ApiException"
     WelcomeDto:
       type: object
       properties:
